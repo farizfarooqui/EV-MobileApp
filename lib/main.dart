@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nobile/Views/HomeScreen.dart';
 import 'package:nobile/Views/OnBoardingScreen.dart';
 
 void main() {
