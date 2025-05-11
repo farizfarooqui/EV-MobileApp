@@ -132,8 +132,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ElevatedButton(
                     onPressed: () async {
                       if (currentPage >= onboardingData.length - 1) {
-                        // Get.to(() => HomeScreen());
-                        Get.offAll(() => StationsScreen());
+                        Get.to(() => HomeScreen());
+                        // Get.offAll(() => StationsScreen());
                       } else {
                         controller!.nextPage(
                           duration: const Duration(milliseconds: 1000),

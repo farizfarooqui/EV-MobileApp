@@ -5,9 +5,11 @@ import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
 import 'package:nobile/Controller/RouteController.dart';
+import 'package:nobile/Controller/stationController.dart';
 
 class HomeScreen extends StatelessWidget {
-  final RouteController controller = Get.put(RouteController());
+  final RouteController routecontroller = Get.put(RouteController());
+  final StationController stationController = Get.put(StationController());
 
   HomeScreen({super.key});
 
@@ -36,20 +38,43 @@ class HomeScreen extends StatelessWidget {
                   subdomains: const ['a', 'b', 'c'],
                 ),
                 MarkerLayer(
-                  markers: controller.vehicles.map((vehicle) {
+                  markers: stationController.stations.map((station) {
                     return Marker(
-                      point: LatLng(vehicle['Latitude'], vehicle['Longitude']),
+                      point: LatLng(station['latitude'], station['longitude']),
                       width: 40.0,
                       height: 40.0,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.8),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.electric_car,
-                          color: Colors.white,
-                          size: 20,
+                      child: GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(20)),
+                            ),
+                            builder: (context) => DraggableScrollableSheet(
+                              expand: false,
+                              initialChildSize: 0.4,
+                              minChildSize: 0.3,
+                              maxChildSize: 0.9,
+                              builder: (_, scrollController) =>
+                                  StationDetailSheet(
+                                station: station,
+                                scrollController: scrollController,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.8),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.ev_station,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                         ),
                       ),
                     );
@@ -57,7 +82,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-
             // Top Bar
             Positioned(
               top: MediaQuery.of(context).padding.top,
@@ -131,184 +155,241 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
+          ],
+        );
+      }),
+    );
+  }
+}
+
+class StationDetailSheet extends StatelessWidget {
+  final Map<String, dynamic> station;
+  final ScrollController scrollController;
+
+  const StationDetailSheet({
+    super.key,
+    required this.station,
+    required this.scrollController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String> chargerTypes =
+        List<String>.from(station['charger_types'] ?? []);
+    final int available = station['total_charging_ports'] ?? 0;
+
+    return SingleChildScrollView(
+      controller: scrollController,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Drag handle
+            Center(
               child: Container(
-                height: MediaQuery.of(context).size.height * 0.4,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(20),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 10,
-                      spreadRadius: 5,
-                    ),
-                  ],
+                width: 40,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: SingleChildScrollView(
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            /// Header
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// Station Info
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Draggable Handle
-                      Center(
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 10),
-                          width: 40,
-                          height: 5,
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                      Text(
+                        station['name'] ?? 'Unknown',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: colorPrimaryLight,
                         ),
                       ),
-
-                      // Station Name
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16, top: 8),
-                        child: Text(
-                          stationName,
-                          style: const TextStyle(
-                            color: colorPrimaryLight,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                      const SizedBox(height: 4),
+                      Text(
+                        station['address'] ?? '',
+                        style: const TextStyle(color: Colors.grey),
                       ),
-
-                      // Station Address
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16, top: 4),
-                        child: Text(
-                          stationAddress,
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-
-                      // Status (Open/Closed)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16, top: 4),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: const Text(
-                            "Open",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Distance
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16, top: 10),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.directions_car,
-                                color: colorPrimary, size: 16),
-                            const SizedBox(width: 8),
-                            Text(
-                              "$distance km",
+                      const SizedBox(height: 8),
+                      const Row(
+                        children: [
+                          Chip(
+                            label: const Text(
+                              'OPEN',
                               style: TextStyle(
-                                color: Colors.grey[700],
-                                fontSize: 14,
+                                color: Colors.white,
+                                fontSize: 10,
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-
-                      // Timings
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16, top: 4),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.access_time,
-                                color: colorPrimary, size: 16),
-                            const SizedBox(width: 8),
-                            Text(
-                              timings,
-                              style: TextStyle(
-                                color: Colors.grey[700],
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Available Connectors
-                      const Padding(
-                        padding: EdgeInsets.only(left: 16, top: 10),
-                        child: Text(
-                          "Available Connectors:",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            backgroundColor: Colors.green,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 0),
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                            visualDensity:
+                                VisualDensity(horizontal: 0, vertical: -4),
                           ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10, top: 4),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: connectors
-                              .map((connector) => Text(
-                                    "- $connector",
-                                    style: TextStyle(
-                                      color: Colors.grey[700],
-                                      fontSize: 14,
-                                    ),
-                                  ))
-                              .toList(),
-                        ),
-                      ),
-
-                      // Navigation Button
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            left: 16, top: 16, right: 16, bottom: 10),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Simulate navigation
-                            log("Navigation started");
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: colorPrimary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            minimumSize: const Size(double.infinity, 50),
-                          ),
-                          child: const Text(
-                            "Navigation",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
+                          SizedBox(width: 8),
+                          Text('24/7'),
+                        ],
                       ),
                     ],
                   ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            /// Reserve / Report
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.event_available, size: 20, color: colorPrimary),
+                    SizedBox(width: 4),
+                    Text("Reserve a spot"),
+                    SizedBox(width: 8),
+                    Chip(
+                      label: const Text(
+                        'New',
+                        style: TextStyle(color: Colors.white, fontSize: 10),
+                      ),
+                      backgroundColor: Colors.green,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 0),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity(horizontal: 0, vertical: -4),
+                    )
+                  ],
+                ),
+                Icon(Icons.help_outline, size: 20),
+              ],
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () {
+                // Report issue
+              },
+              child: const Row(
+                children: [
+                  Icon(Icons.report_problem_outlined, size: 20),
+                  SizedBox(width: 8),
+                  Text("Report an issue"),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            /// Availability Chips
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _statusChip("Available", available, Colors.blue[900]!),
+                _statusChip("Occupied", 0, Colors.amber[700]!),
+                _statusChip("Unavailable", 0, Colors.red),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            const Divider(),
+
+            /// Charger Type List (from strings)
+            ...chargerTypes.map((type) => Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.electric_bolt, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            type,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right),
+                      ],
+                    ),
+                    const Divider(),
+                  ],
+                )),
+
+            const SizedBox(height: 16),
+
+            /// Bottom "Navigate" Button
+            ElevatedButton(
+              onPressed: () {
+                // Navigate
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorPrimary,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              child: const Text(
+                'Navigate',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                //
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorPrimary,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              child: const Text(
+                'Book',
+                style: TextStyle(color: Colors.white),
               ),
             ),
           ],
-        );
-      }),
+        ),
+      ),
+    );
+  }
+
+  Widget _statusChip(String label, int count, Color color) {
+    return Chip(
+      backgroundColor: color.withOpacity(0.1),
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: color,
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(width: 4),
+          CircleAvatar(
+            radius: 10,
+            backgroundColor: color,
+            child: Text(
+              "$count",
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+            ),
+          )
+        ],
+      ),
     );
   }
 }

@@ -25,7 +25,7 @@ class StationController extends GetxController {
         collectionId: '68208c0c002c30a85ef6',
       );
       stations.value = documents.documents.map((doc) => doc.data).toList();
-      log('Loaded');
+      log(stations.toString());
     } catch (e) {
       print('Error fetching stations: $e');
       log('Error fetching stations: $e');
