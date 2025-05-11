@@ -143,6 +143,7 @@ class _CustomOnBoardingScreenState extends State<CustomOnBoardingScreen>
                       'assets/SVG/Vector.svg',
                       fit: BoxFit.contain,
                       // color: const Color(0xFFC4C4C4),
+                      // ignore: deprecated_member_use
                       color: Colors.white,
                     ),
                   ),

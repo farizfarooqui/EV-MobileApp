@@ -1,8 +1,10 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
 import 'package:nobile/Views/HomeScreen.dart';
+import 'package:nobile/Views/StationsScreen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -130,7 +132,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ElevatedButton(
                     onPressed: () async {
                       if (currentPage >= onboardingData.length - 1) {
-                        Get.to(() => HomeScreen());
+                        // Get.to(() => HomeScreen());
+                        Get.offAll(() => StationsScreen());
                       } else {
                         controller!.nextPage(
                           duration: const Duration(milliseconds: 1000),

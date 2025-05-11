@@ -1,7 +1,8 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
 import 'package:nobile/Controller/RouteController.dart';
 
@@ -96,15 +97,15 @@ class HomeScreen extends StatelessWidget {
                               color: Colors.grey[100],
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Row(
+                            child: const Row(
                               children: [
-                                const Icon(Icons.electric_bolt_sharp,
+                                Icon(Icons.electric_bolt_sharp,
                                     color: colorPrimary),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'Total Stations',
                                       style: TextStyle(
                                         fontSize: 12,
@@ -113,7 +114,7 @@ class HomeScreen extends StatelessWidget {
                                     ),
                                     Text(
                                       '12',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -136,7 +137,7 @@ class HomeScreen extends StatelessWidget {
               right: 0,
               child: Container(
                 height: MediaQuery.of(context).size.height * 0.4,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(20),
@@ -156,7 +157,7 @@ class HomeScreen extends StatelessWidget {
                       // Draggable Handle
                       Center(
                         child: Container(
-                          margin: EdgeInsets.only(top: 10),
+                          margin: const EdgeInsets.only(top: 10),
                           width: 40,
                           height: 5,
                           decoration: BoxDecoration(
@@ -168,10 +169,10 @@ class HomeScreen extends StatelessWidget {
 
                       // Station Name
                       Padding(
-                        padding: EdgeInsets.only(left: 16, top: 8),
+                        padding: const EdgeInsets.only(left: 16, top: 8),
                         child: Text(
                           stationName,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: colorPrimaryLight,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -181,10 +182,10 @@ class HomeScreen extends StatelessWidget {
 
                       // Station Address
                       Padding(
-                        padding: EdgeInsets.only(left: 16, top: 4),
+                        padding: const EdgeInsets.only(left: 16, top: 4),
                         child: Text(
                           stationAddress,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.grey,
                             fontSize: 14,
                           ),
@@ -193,15 +194,15 @@ class HomeScreen extends StatelessWidget {
 
                       // Status (Open/Closed)
                       Padding(
-                        padding: EdgeInsets.only(left: 16, top: 4),
+                        padding: const EdgeInsets.only(left: 16, top: 4),
                         child: Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: Colors.green,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Text(
+                          child: const Text(
                             "Open",
                             style: TextStyle(
                               color: Colors.white,
@@ -231,12 +232,12 @@ class HomeScreen extends StatelessWidget {
 
                       // Timings
                       Padding(
-                        padding: EdgeInsets.only(left: 16, top: 4),
+                        padding: const EdgeInsets.only(left: 16, top: 4),
                         child: Row(
                           children: [
                             const Icon(Icons.access_time,
                                 color: colorPrimary, size: 16),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Text(
                               timings,
                               style: TextStyle(
@@ -282,14 +283,14 @@ class HomeScreen extends StatelessWidget {
                         child: ElevatedButton(
                           onPressed: () {
                             // Simulate navigation
-                            print("Navigation started");
+                            log("Navigation started");
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: colorPrimary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            minimumSize: Size(double.infinity, 50),
+                            minimumSize: const Size(double.infinity, 50),
                           ),
                           child: const Text(
                             "Navigation",
