@@ -4,20 +4,12 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
-import 'package:nobile/Controller/RouteController.dart';
 import 'package:nobile/Controller/stationController.dart';
 
 class HomeScreen extends StatelessWidget {
-  final RouteController routecontroller = Get.put(RouteController());
   final StationController stationController = Get.put(StationController());
 
   HomeScreen({super.key});
-
-  final String stationName = "Deewan Motors";
-  final String stationAddress = "Shahrah-e-Faisal, Karachi";
-  final double distance = 2.5;
-  final String timings = "12:00 am - 11:59 pm";
-  final List<String> connectors = ["Type 2", "CCS"];
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +20,12 @@ class HomeScreen extends StatelessWidget {
             // Map Layer
             FlutterMap(
               options: const MapOptions(
-                initialCenter: LatLng(24.8607, 67.0011),
-                minZoom: 11,
+                initialCenter:
+                    LatLng(24.884928, 67.058579), // Center of Karachi
+                //24.884928, 67.058579
+                initialZoom: 12, // Zoomed out to cover entire city
+                minZoom: 10,
+                maxZoom: 18,
               ),
               children: [
                 TileLayer(
@@ -40,7 +36,7 @@ class HomeScreen extends StatelessWidget {
                 MarkerLayer(
                   markers: stationController.stations.map((station) {
                     return Marker(
-                      point: LatLng(station['latitude'], station['longitude']),
+                      point: LatLng(station.latitude, station.longitude),
                       width: 40.0,
                       height: 40.0,
                       child: GestureDetector(
@@ -59,7 +55,7 @@ class HomeScreen extends StatelessWidget {
                               maxChildSize: 0.9,
                               builder: (_, scrollController) =>
                                   StationDetailSheet(
-                                station: station,
+                                station: station.toJson(),
                                 scrollController: scrollController,
                               ),
                             ),
@@ -67,7 +63,7 @@ class HomeScreen extends StatelessWidget {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.8),
+                            color: Colors.green.withOpacity(0.8),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -121,26 +117,29 @@ class HomeScreen extends StatelessWidget {
                               color: Colors.grey[100],
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Row(
+                            child: Row(
                               children: [
-                                Icon(Icons.electric_bolt_sharp,
+                                const Icon(Icons.electric_bolt_sharp,
                                     color: colorPrimary),
-                                SizedBox(width: 8),
+                                const SizedBox(width: 8),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
+                                    const Text(
                                       'Total Stations',
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Colors.grey,
                                       ),
                                     ),
-                                    Text(
-                                      '12',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
+                                    Obx(
+                                      () => Text(
+                                        stationController.stations.length
+                                            .toString(),
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -212,7 +211,7 @@ class StationDetailSheet extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: colorPrimaryLight,
+                          color: colorPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
