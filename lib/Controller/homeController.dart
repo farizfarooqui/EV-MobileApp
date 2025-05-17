@@ -5,7 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
-class StationController extends GetxController {
+class HomeController extends GetxController {
   final RxList<ChargingStation> stations = <ChargingStation>[].obs;
   final RxBool isLoading = false.obs;
   final RxString searchQuery = ''.obs;
@@ -14,6 +14,10 @@ class StationController extends GetxController {
   final RxList<String> selectedPorts = <String>[].obs;
   final RxList<String> selectedPaymentMethods = <String>[].obs;
   final RxDouble maxDistance = 10.0.obs;
+  final RxBool showSearch = false.obs;
+  final RxList<Map<String, dynamic>> searchResults =
+      <Map<String, dynamic>>[].obs;
+  final TextEditingController searchController = TextEditingController();
 
   final _supabase = Supabase.instance.client;
 
@@ -145,5 +149,24 @@ class StationController extends GetxController {
     selectedPaymentMethods.clear();
     maxDistance.value = 10.0;
     update();
+  }
+
+  void onSearchChanged(String value) {
+    searchResults.value = stations
+        .where((station) =>
+            station.name.toLowerCase().contains(value.toLowerCase()) ||
+            station.address.toLowerCase().contains(value.toLowerCase()))
+        .map((station) => station.toJson())
+        .toList();
+  }
+
+  void showSearchBar() {
+    showSearch.value = true;
+  }
+
+  void hideSearchBar() {
+    showSearch.value = false;
+    searchController.clear();
+    searchResults.clear();
   }
 }

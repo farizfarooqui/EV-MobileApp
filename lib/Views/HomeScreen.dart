@@ -4,12 +4,32 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
-import 'package:nobile/Controller/stationController.dart';
+import 'package:nobile/Controller/homeController.dart';
 
-class HomeScreen extends StatelessWidget {
-  final StationController stationController = Get.put(StationController());
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
-  HomeScreen({super.key});
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final HomeController homeController = Get.put(HomeController());
+  late final MapController _mapController;
+
+  @override
+  void initState() {
+    super.initState();
+    _mapController = MapController();
+  }
+
+  void _goToStation(Map<String, dynamic> station) {
+    homeController.hideSearchBar();
+    _mapController.move(
+      LatLng(station['latitude'], station['longitude']),
+      16.0,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,22 +39,23 @@ class HomeScreen extends StatelessWidget {
           children: [
             // Map Layer
             FlutterMap(
+              mapController: _mapController,
               options: const MapOptions(
-                initialCenter:
-                    LatLng(24.884928, 67.058579), // Center of Karachi
-                //24.884928, 67.058579
-                initialZoom: 12, // Zoomed out to cover entire city
+                initialCenter: LatLng(24.884928, 67.058579),
+                initialZoom: 12,
                 minZoom: 10,
                 maxZoom: 18,
               ),
               children: [
                 TileLayer(
-                  urlTemplate:
-                      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  urlTemplate: Theme.of(context).brightness == Brightness.dark
+                      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+                      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.example.app',
                   subdomains: const ['a', 'b', 'c'],
                 ),
                 MarkerLayer(
-                  markers: stationController.stations.map((station) {
+                  markers: homeController.stations.map((station) {
                     return Marker(
                       point: LatLng(station.latitude, station.longitude),
                       width: 40.0,
@@ -63,12 +84,15 @@ class HomeScreen extends StatelessWidget {
                         },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.8),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.8),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.ev_station,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onPrimary,
                             size: 20,
                           ),
                         ),
@@ -78,82 +102,119 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-            // Top Bar
-            Positioned(
-              top: MediaQuery.of(context).padding.top,
-              left: 0,
-              right: 0,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                margin: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Search Nearest EV Station',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+            // Floating Search Icon
+            Obx(() => !homeController.showSearch.value
+                ? Positioned(
+                    top: MediaQuery.of(context).padding.top + 16,
+                    right: 24,
+                    child: Material(
+                      color: Colors.transparent,
+                      shape: const CircleBorder(),
+                      elevation: 6,
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: homeController.showSearchBar,
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).cardColor,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Theme.of(context)
+                                    .shadowColor
+                                    .withOpacity(0.15),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: Theme.of(context)
+                                  .dividerColor
+                                  .withOpacity(0.15),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Icon(Icons.search,
+                              color: Theme.of(context).iconTheme.color),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
+                  )
+                : const SizedBox.shrink()),
+            // Search Bar
+            Obx(() => homeController.showSearch.value
+                ? Positioned(
+                    top: MediaQuery.of(context).padding.top + 16,
+                    left: 16,
+                    right: 16,
+                    child: Column(
                       children: [
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.electric_bolt_sharp,
-                                    color: colorPrimary),
-                                const SizedBox(width: 8),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Total Stations',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    Obx(
-                                      () => Text(
-                                        stationController.stations.length
-                                            .toString(),
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                        Material(
+                          elevation: 8,
+                          borderRadius: BorderRadius.circular(32),
+                          child: TextField(
+                            controller: homeController.searchController,
+                            autofocus: true,
+                            onChanged: homeController.onSearchChanged,
+                            decoration: InputDecoration(
+                              hintText: 'Search by station',
+                              prefixIcon: const Icon(Icons.search),
+                              suffixIcon: IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: homeController.hideSearchBar,
+                              ),
+                              filled: true,
+                              fillColor: Theme.of(context).cardColor,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 0, horizontal: 16),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(32),
+                                borderSide: BorderSide.none,
+                              ),
                             ),
                           ),
                         ),
+                        homeController.searchController.text.isNotEmpty &&
+                                homeController.searchResults.isNotEmpty
+                            ? Container(
+                                margin: const EdgeInsets.only(top: 8),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).cardColor,
+                                  borderRadius: BorderRadius.circular(24),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Theme.of(context)
+                                          .shadowColor
+                                          .withOpacity(0.1),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: ListView.separated(
+                                  shrinkWrap: true,
+                                  itemCount:
+                                      homeController.searchResults.length,
+                                  separatorBuilder: (_, __) =>
+                                      const Divider(height: 1),
+                                  itemBuilder: (context, index) {
+                                    final station =
+                                        homeController.searchResults[index];
+                                    return ListTile(
+                                      title: Text(station['name'] ?? ''),
+                                      subtitle: Text(station['address'] ?? ''),
+                                      onTap: () => _goToStation(station),
+                                    );
+                                  },
+                                ),
+                              )
+                            : const SizedBox.shrink()
                       ],
                     ),
-                  ],
-                ),
-              ),
-            ),
+                  )
+                : const SizedBox.shrink()),
           ],
         );
       }),
