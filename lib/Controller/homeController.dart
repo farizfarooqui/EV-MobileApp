@@ -6,6 +6,8 @@ import 'package:nobile/Model/ChargingStationModel.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomeController extends GetxController {
   late final MapController mapController;
@@ -21,6 +23,7 @@ class HomeController extends GetxController {
   final RxList<Map<String, dynamic>> searchResults =
       <Map<String, dynamic>>[].obs;
   final TextEditingController searchController = TextEditingController();
+  final Rx<Position?> currentPosition = Rx<Position?>(null);
 
   final _supabase = Supabase.instance.client;
 
@@ -29,6 +32,52 @@ class HomeController extends GetxController {
     super.onInit();
     mapController = MapController();
     fetchStations();
+    getCurrentLocation();
+  }
+
+  Future<void> getCurrentLocation() async {
+    try {
+      // Request location permission
+      var status = await Permission.location.request();
+      if (status.isGranted) {
+        // Get current position
+        Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        );
+        currentPosition.value = position;
+
+        // Move map to current position
+        mapController.move(
+          LatLng(position.latitude, position.longitude),
+          16.0,
+        );
+      } else {
+        log("Please grant location permission to use this feature.");
+        // toastification.show(
+        //   context: Get.context!,
+        //   title: const Text('Location Permission Required'),
+        //   description: const Text(
+        //       'Please grant location permission to use this feature.'),
+        //   type: ToastificationType.warning,
+        //   style: ToastificationStyle.fillColored,
+        //   autoCloseDuration: const Duration(seconds: 3),
+        //   alignment: Alignment.bottomRight,
+        //   icon: const Icon(Icons.location_off, color: Colors.white),
+        // );
+      }
+    } catch (e) {
+      log("Error getting location: ${e.toString()}");
+      toastification.show(
+        context: Get.context!,
+        title: const Text('Error'),
+        description: Text('Failed to get location: ${e.toString()}'),
+        type: ToastificationType.error,
+        style: ToastificationStyle.fillColored,
+        autoCloseDuration: const Duration(seconds: 3),
+        alignment: Alignment.bottomRight,
+        icon: const Icon(Icons.error, color: Colors.white),
+      );
+    }
   }
 
   Future<void> reloadStations() async {

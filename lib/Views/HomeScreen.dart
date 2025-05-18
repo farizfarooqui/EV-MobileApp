@@ -1,10 +1,12 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
 import 'package:nobile/Controller/homeController.dart';
+import 'package:nobile/Views/StationFilterSheet.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -14,16 +16,44 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 90),
-        child: FloatingActionButton(
-          onPressed: () {},
-          backgroundColor: colorNavBar,
-          child: const Icon(
-            Icons.candlestick_chart_rounded,
-            color: iconDisable,
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: FloatingActionButton(
+              onPressed: () {
+                homeController.getCurrentLocation();
+              },
+              backgroundColor: colorNavBar,
+              child: const Icon(
+                Icons.my_location,
+                color: colorPrimary,
+              ),
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 90),
+            child: FloatingActionButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(24)),
+                  ),
+                  builder: (context) => StationFilterSheet(),
+                );
+              },
+              backgroundColor: colorNavBar,
+              child: const Icon(
+                Icons.filter_list,
+                color: colorPrimary,
+              ),
+            ),
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: Stack(
@@ -45,6 +75,25 @@ class HomeScreen extends StatelessWidget {
                 userAgentPackageName: 'com.example.app',
                 subdomains: const ['a', 'b', 'c'],
               ),
+              // Current Location Marker
+              Obx(() {
+                final position = homeController.currentPosition.value;
+                if (position == null) return const SizedBox.shrink();
+                return MarkerLayer(
+                  markers: [
+                    Marker(
+                        point: LatLng(position.latitude, position.longitude),
+                        width: 30,
+                        height: 30,
+                        child: SvgPicture.asset(
+                          'assets/SVG/location.svg',
+                          width: 30,
+                          height: 30,
+                        )),
+                  ],
+                );
+              }),
+              // Station Markers
               Obx(
                 () => MarkerLayer(
                   markers: homeController.stations.map((station) {
