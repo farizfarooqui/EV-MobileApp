@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Views/MyVehicle/add_vehicle_screen.dart';
-import '../../Controllers/my_vehicle_controller.dart';
+import '../../Controller/my_vehicle_controller.dart';
 
 class SelectModelScreen extends StatelessWidget {
   SelectModelScreen({super.key});
@@ -57,7 +57,7 @@ class SelectModelScreen extends StatelessWidget {
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
                       controller.selectModel(model);
-                      Get.to(AddVehicleScreen());
+                      Get.to(() => AddVehicleScreen());
                     },
                   );
                 },

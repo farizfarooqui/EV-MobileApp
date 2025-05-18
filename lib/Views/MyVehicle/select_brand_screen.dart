@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Views/MyVehicle/select_model_screen.dart';
-import '../../Controllers/my_vehicle_controller.dart';
+import '../../Controller/my_vehicle_controller.dart';
 
 class SelectBrandScreen extends StatelessWidget {
   SelectBrandScreen({Key? key}) : super(key: key);
@@ -56,7 +56,7 @@ class SelectBrandScreen extends StatelessWidget {
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
                       controller.selectBrand(brand);
-                      Get.to(SelectModelScreen());
+                      Get.to(() => SelectModelScreen());
                     },
                   );
                 },

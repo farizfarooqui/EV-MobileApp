@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
 import 'package:nobile/Views/MyVehicle/select_brand_screen.dart';
-import '../../Controllers/my_vehicle_controller.dart';
+import '../../Controller/my_vehicle_controller.dart';
 
 class MyVehicleScreen extends StatelessWidget {
   MyVehicleScreen({Key? key}) : super(key: key);
@@ -50,7 +50,7 @@ class MyVehicleScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  Get.to(SelectBrandScreen());
+                  Get.to(()=>SelectBrandScreen());
                 },
                 child: const Text(
                   'Add vehicle',

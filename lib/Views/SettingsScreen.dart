@@ -10,61 +10,68 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        children: [
-          const SizedBox(height: 8),
-          Text('SETTINGS',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleSmall
-                  ?.copyWith(fontWeight: FontWeight.bold)),
-          Card(
-            color: Theme.of(context).cardColor,
-            elevation: 0,
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: Column(
-              children: [
-                _ProfileRow(
-                    icon: Icons.language, text: 'Language', onTap: () {}),
-                _ProfileRow(
-                    icon: Icons.palette_outlined,
-                    text: 'Appearance',
-                    onTap: () {
-                      Get.to(AppearanceScreen());
-                    }),
-                _ProfileRow(icon: Icons.logout, text: 'Log out', onTap: () {}),
-              ],
-            ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 8),
+              Text('SETTINGS',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall
+                      ?.copyWith(fontWeight: FontWeight.bold)),
+              Card(
+                color: Theme.of(context).cardColor,
+                elevation: 0,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                child: Column(
+                  children: [
+                    _ProfileRow(
+                        icon: Icons.language, text: 'Language', onTap: () {}),
+                    _ProfileRow(
+                        icon: Icons.palette_outlined,
+                        text: 'Appearance',
+                        onTap: () {
+                          Get.to(() => AppearanceScreen());
+                        }),
+                    _ProfileRow(
+                        icon: Icons.logout, text: 'Log out', onTap: () {}),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text('SUPPORT',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall
+                      ?.copyWith(fontWeight: FontWeight.bold)),
+              Card(
+                color: Theme.of(context).cardColor,
+                elevation: 0,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                child: Column(
+                  children: [
+                    _ProfileRow(
+                        icon: Icons.help_outline,
+                        text: 'Help & FAQ',
+                        onTap: () {}),
+                    _ProfileRow(
+                        icon: Icons.chat_bubble_outline,
+                        text: 'Contact us',
+                        onTap: () {}),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text('SUPPORT',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleSmall
-                  ?.copyWith(fontWeight: FontWeight.bold)),
-          Card(
-            color: Theme.of(context).cardColor,
-            elevation: 0,
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: Column(
-              children: [
-                _ProfileRow(
-                    icon: Icons.help_outline, text: 'Help & FAQ', onTap: () {}),
-                _ProfileRow(
-                    icon: Icons.chat_bubble_outline,
-                    text: 'Contact us',
-                    onTap: () {}),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-        ],
+        ),
       ),
     );
   }

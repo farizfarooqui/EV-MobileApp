@@ -6,55 +6,47 @@ import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
 import 'package:nobile/Controller/homeController.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  HomeScreen({super.key});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
   final HomeController homeController = Get.put(HomeController());
-  late final MapController _mapController;
-
-  @override
-  void initState() {
-    super.initState();
-    _mapController = MapController();
-  }
-
-  void _goToStation(Map<String, dynamic> station) {
-    homeController.hideSearchBar();
-    _mapController.move(
-      LatLng(station['latitude'], station['longitude']),
-      16.0,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Obx(() {
-        return Stack(
-          children: [
-            // Map Layer
-            FlutterMap(
-              mapController: _mapController,
-              options: const MapOptions(
-                initialCenter: LatLng(24.884928, 67.058579),
-                initialZoom: 12,
-                minZoom: 10,
-                maxZoom: 18,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 90),
+        child: FloatingActionButton(
+          onPressed: () {},
+          backgroundColor: colorNavBar,
+          child: const Icon(
+            Icons.candlestick_chart_rounded,
+            color: iconDisable,
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      body: Stack(
+        children: [
+          // Map Layer
+          FlutterMap(
+            mapController: homeController.mapController,
+            options: const MapOptions(
+              initialCenter: LatLng(24.884928, 67.058579),
+              initialZoom: 12,
+              minZoom: 10,
+              maxZoom: 18,
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: Theme.of(context).brightness == Brightness.dark
+                    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+                    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.example.app',
+                subdomains: const ['a', 'b', 'c'],
               ),
-              children: [
-                TileLayer(
-                  urlTemplate: Theme.of(context).brightness == Brightness.dark
-                      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
-                      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.example.app',
-                  subdomains: const ['a', 'b', 'c'],
-                ),
-                MarkerLayer(
+              Obx(
+                () => MarkerLayer(
                   markers: homeController.stations.map((station) {
                     return Marker(
                       point: LatLng(station.latitude, station.longitude),
@@ -100,124 +92,124 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   }).toList(),
                 ),
-              ],
-            ),
-            // Floating Search Icon
-            Obx(() => !homeController.showSearch.value
-                ? Positioned(
-                    top: MediaQuery.of(context).padding.top + 16,
-                    right: 24,
-                    child: Material(
-                      color: Colors.transparent,
-                      shape: const CircleBorder(),
-                      elevation: 6,
-                      child: InkWell(
-                        customBorder: const CircleBorder(),
-                        onTap: homeController.showSearchBar,
-                        child: Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).cardColor,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Theme.of(context)
-                                    .shadowColor
-                                    .withOpacity(0.15),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                            border: Border.all(
+              ),
+            ],
+          ),
+          // Floating Search Icon
+          Obx(() => !homeController.showSearch.value
+              ? Positioned(
+                  top: MediaQuery.of(context).padding.top + 16,
+                  right: 24,
+                  child: Material(
+                    color: Colors.transparent,
+                    shape: const CircleBorder(),
+                    elevation: 6,
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: homeController.showSearchBar,
+                      child: Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
                               color: Theme.of(context)
-                                  .dividerColor
+                                  .shadowColor
                                   .withOpacity(0.15),
-                              width: 1.5,
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
                             ),
+                          ],
+                          border: Border.all(
+                            color: Theme.of(context)
+                                .dividerColor
+                                .withOpacity(0.15),
+                            width: 1.5,
                           ),
-                          child: Icon(Icons.search,
-                              color: Theme.of(context).iconTheme.color),
                         ),
+                        child: Icon(Icons.search,
+                            color: Theme.of(context).iconTheme.color),
                       ),
                     ),
-                  )
-                : const SizedBox.shrink()),
-            // Search Bar
-            Obx(() => homeController.showSearch.value
-                ? Positioned(
-                    top: MediaQuery.of(context).padding.top + 16,
-                    left: 16,
-                    right: 16,
-                    child: Column(
-                      children: [
-                        Material(
-                          elevation: 8,
-                          borderRadius: BorderRadius.circular(32),
-                          child: TextField(
-                            controller: homeController.searchController,
-                            autofocus: true,
-                            onChanged: homeController.onSearchChanged,
-                            decoration: InputDecoration(
-                              hintText: 'Search by station',
-                              prefixIcon: const Icon(Icons.search),
-                              suffixIcon: IconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed: homeController.hideSearchBar,
-                              ),
-                              filled: true,
-                              fillColor: Theme.of(context).cardColor,
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 0, horizontal: 16),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(32),
-                                borderSide: BorderSide.none,
-                              ),
+                  ),
+                )
+              : const SizedBox.shrink()),
+          // Search Bar
+          Obx(() => homeController.showSearch.value
+              ? Positioned(
+                  top: MediaQuery.of(context).padding.top + 16,
+                  left: 16,
+                  right: 16,
+                  child: Column(
+                    children: [
+                      Material(
+                        elevation: 8,
+                        borderRadius: BorderRadius.circular(32),
+                        child: TextField(
+                          controller: homeController.searchController,
+                          autofocus: true,
+                          onChanged: homeController.onSearchChanged,
+                          decoration: InputDecoration(
+                            hintText: 'Search by station',
+                            prefixIcon: const Icon(Icons.search),
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.close),
+                              onPressed: homeController.hideSearchBar,
+                            ),
+                            filled: true,
+                            fillColor: Theme.of(context).cardColor,
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 0, horizontal: 16),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(32),
+                              borderSide: BorderSide.none,
                             ),
                           ),
                         ),
-                        homeController.searchController.text.isNotEmpty &&
-                                homeController.searchResults.isNotEmpty
-                            ? Container(
-                                margin: const EdgeInsets.only(top: 8),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.circular(24),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Theme.of(context)
-                                          .shadowColor
-                                          .withOpacity(0.1),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: ListView.separated(
-                                  shrinkWrap: true,
-                                  itemCount:
-                                      homeController.searchResults.length,
-                                  separatorBuilder: (_, __) =>
-                                      const Divider(height: 1),
-                                  itemBuilder: (context, index) {
-                                    final station =
-                                        homeController.searchResults[index];
-                                    return ListTile(
-                                      title: Text(station['name'] ?? ''),
-                                      subtitle: Text(station['address'] ?? ''),
-                                      onTap: () => _goToStation(station),
-                                    );
-                                  },
-                                ),
-                              )
-                            : const SizedBox.shrink()
-                      ],
-                    ),
-                  )
-                : const SizedBox.shrink()),
-          ],
-        );
-      }),
+                      ),
+                      homeController.searchController.text.isNotEmpty &&
+                              homeController.searchResults.isNotEmpty
+                          ? Container(
+                              margin: const EdgeInsets.only(top: 8),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).cardColor,
+                                borderRadius: BorderRadius.circular(24),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Theme.of(context)
+                                        .shadowColor
+                                        .withOpacity(0.1),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: ListView.separated(
+                                shrinkWrap: true,
+                                itemCount: homeController.searchResults.length,
+                                separatorBuilder: (_, __) =>
+                                    const Divider(height: 1),
+                                itemBuilder: (context, index) {
+                                  final station =
+                                      homeController.searchResults[index];
+                                  return ListTile(
+                                    title: Text(station['name'] ?? ''),
+                                    subtitle: Text(station['address'] ?? ''),
+                                    onTap: () =>
+                                        homeController.goToStation(station),
+                                  );
+                                },
+                              ),
+                            )
+                          : const SizedBox.shrink()
+                    ],
+                  ),
+                )
+              : const SizedBox.shrink()),
+        ],
+      ),
     );
   }
 }

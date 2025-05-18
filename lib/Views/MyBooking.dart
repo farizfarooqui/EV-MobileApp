@@ -1,31 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:nobile/Controller/BookingController.dart';
 
-class MyBookingScreen extends StatefulWidget {
-  const MyBookingScreen({super.key});
-
-  @override
-  State<MyBookingScreen> createState() => _MyBookingScreenState();
-}
-
-class _MyBookingScreenState extends State<MyBookingScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+class MyBookingScreen extends StatelessWidget {
+  MyBookingScreen({super.key});
+  final BookingController bookingController = Get.put(BookingController());
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -41,10 +23,9 @@ class _MyBookingScreenState extends State<MyBookingScreen>
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(48),
-          child: Container(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            child: TabBar(
-              controller: _tabController,
+          child: GetBuilder<BookingController>(
+            builder: (controller) => TabBar(
+              controller: controller.tabController,
               indicatorColor: Theme.of(context).colorScheme.primary,
               labelColor: Theme.of(context).colorScheme.primary,
               unselectedLabelColor: Theme.of(context)
@@ -61,24 +42,24 @@ class _MyBookingScreenState extends State<MyBookingScreen>
           ),
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildEmptyState(context, 'No requested bookings found.'),
-          _buildEmptyState(context, 'No completed bookings found.'),
-          _buildEmptyState(context, 'No canceled bookings found.'),
-        ],
+      body: GetBuilder<BookingController>(
+        builder: (controller) => TabBarView(
+          controller: controller.tabController,
+          children: [
+            _buildEmptyState(context, 'No requested bookings found.'),
+            _buildEmptyState(context, 'No completed bookings found.'),
+            _buildEmptyState(context, 'No canceled bookings found.'),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildEmptyState(BuildContext context, String message) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Illustration (replace with your asset if available)
           Icon(Icons.inbox,
               size: 80, color: Theme.of(context).hintColor.withOpacity(0.3)),
           const SizedBox(height: 24),

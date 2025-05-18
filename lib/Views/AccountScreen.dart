@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nobile/Views/AppearanceScreen.dart';
 import 'package:nobile/Views/MyVehicle/my_vehicle_screen.dart';
 
 class AccountScreen extends StatelessWidget {
@@ -47,7 +46,7 @@ class AccountScreen extends StatelessWidget {
                           icon: Icons.directions_car,
                           text: 'My vehicle',
                           onTap: () {
-                            Get.to(MyVehicleScreen());
+                            Get.to(() => MyVehicleScreen());
                           }),
                       _ProfileRow(
                           icon: Icons.badge_outlined,

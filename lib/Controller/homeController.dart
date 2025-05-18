@@ -1,11 +1,14 @@
 import 'dart:developer';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:nobile/Model/ChargingStationModel.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
 class HomeController extends GetxController {
+  late final MapController mapController;
   final RxList<ChargingStation> stations = <ChargingStation>[].obs;
   final RxBool isLoading = false.obs;
   final RxString searchQuery = ''.obs;
@@ -24,11 +27,20 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    mapController = MapController();
     fetchStations();
   }
 
   Future<void> reloadStations() async {
     await fetchStations();
+  }
+
+  void goToStation(Map<String, dynamic> station) {
+    hideSearchBar();
+    mapController.move(
+      LatLng(station['latitude'], station['longitude']),
+      16.0,
+    );
   }
 
   Future<void> fetchStations() async {

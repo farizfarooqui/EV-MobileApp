@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../Controllers/my_vehicle_controller.dart';
+import '../../Controller/my_vehicle_controller.dart';
 
 class AddVehicleScreen extends StatelessWidget {
   AddVehicleScreen({Key? key}) : super(key: key);
