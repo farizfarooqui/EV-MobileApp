@@ -23,7 +23,8 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16),
             child: FloatingActionButton(
               onPressed: () {
-                homeController.getCurrentLocation();
+                // homeController.getCurrentLocation();
+                //move on click only
               },
               backgroundColor: colorNavBar,
               child: const Icon(
@@ -82,14 +83,15 @@ class HomeScreen extends StatelessWidget {
                 return MarkerLayer(
                   markers: [
                     Marker(
-                        point: LatLng(position.latitude, position.longitude),
+                      point: LatLng(position.latitude, position.longitude),
+                      width: 30,
+                      height: 30,
+                      child: SvgPicture.asset(
+                        'assets/SVG/location.svg',
                         width: 30,
                         height: 30,
-                        child: SvgPicture.asset(
-                          'assets/SVG/location.svg',
-                          width: 30,
-                          height: 30,
-                        )),
+                      ),
+                    ),
                   ],
                 );
               }),

@@ -25,6 +25,13 @@ class HomeController extends GetxController {
   final TextEditingController searchController = TextEditingController();
   final Rx<Position?> currentPosition = Rx<Position?>(null);
 
+  // New filter parameters
+  final RxList<String> selectedAmenities = <String>[].obs;
+  final RxDouble minHourlyRate = 0.0.obs;
+  final RxDouble maxHourlyRate = double.infinity.obs;
+  final RxDouble minPricePerKwh = 0.0.obs;
+  final RxDouble maxPricePerKwh = double.infinity.obs;
+
   final _supabase = Supabase.instance.client;
 
   @override
@@ -47,10 +54,10 @@ class HomeController extends GetxController {
         currentPosition.value = position;
 
         // Move map to current position
-        mapController.move(
-          LatLng(position.latitude, position.longitude),
-          16.0,
-        );
+        // mapController.move(
+        //   LatLng(position.latitude, position.longitude),
+        //   16.0,
+        // );
       } else {
         log("Please grant location permission to use this feature.");
         // toastification.show(
@@ -106,6 +113,81 @@ class HomeController extends GetxController {
         context: Get.context!,
         title: const Text('Error'),
         description: Text(e.toString()),
+        type: ToastificationType.error,
+        style: ToastificationStyle.fillColored,
+        autoCloseDuration: const Duration(seconds: 3),
+        alignment: Alignment.bottomRight,
+        icon: const Icon(Icons.error, color: Colors.white),
+      );
+    } finally {
+      isLoading.value = false;
+      update();
+    }
+  }
+
+  Future<void> filterStations({
+    List<String>? chargerTypes,
+    List<String>? amenities,
+    List<String>? paymentMethods,
+    double? minHourlyRate,
+    double? maxHourlyRate,
+    double? minPricePerKwh,
+    double? maxPricePerKwh,
+  }) async {
+    isLoading.value = true;
+    try {
+      var query = _supabase.from('stations').select();
+
+      // Filter by charger types
+      if (chargerTypes != null && chargerTypes.isNotEmpty) {
+        query = query.contains('chargertypes', chargerTypes);
+        log("Filtering by charger types: $chargerTypes");
+      }
+
+      // Filter by amenities
+      if (amenities != null && amenities.isNotEmpty) {
+        query = query.contains('amenities', amenities);
+        log("Filtering by amenities: $amenities");
+      }
+
+      // Filter by payment methods
+      if (paymentMethods != null && paymentMethods.isNotEmpty) {
+        query = query.contains('paymentmethods', paymentMethods);
+        log("Filtering by payment methods: $paymentMethods");
+      }
+
+      // Filter by hourly rate
+      if (minHourlyRate != null) {
+        query = query.gte('hourlyrate', minHourlyRate);
+      }
+
+      if (maxHourlyRate != null && maxHourlyRate != double.infinity) {
+        query = query.lte('hourlyrate', maxHourlyRate);
+      }
+
+      // Filter by price per kWh
+      if (minPricePerKwh != null) {
+        query = query.gte('priceperkwh', minPricePerKwh);
+      }
+
+      if (maxPricePerKwh != null && maxPricePerKwh != double.infinity) {
+        query = query.lte('priceperkwh', maxPricePerKwh);
+      }
+
+      // Execute the query
+      final response = await query;
+      log("Filtered response: $response");
+
+      // Update the stations list with the filtered results
+      stations.value = (response as List)
+          .map((json) => ChargingStation.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      log("Error during filtering: ${e.toString()}");
+      toastification.show(
+        context: Get.context!,
+        title: const Text('Error'),
+        description: Text('Failed to filter stations: ${e.toString()}'),
         type: ToastificationType.error,
         style: ToastificationStyle.fillColored,
         autoCloseDuration: const Duration(seconds: 3),
@@ -201,6 +283,24 @@ class HomeController extends GetxController {
     update();
   }
 
+  // Update filter parameters
+  void updateAmenitiesFilter(List<String> amenities) {
+    selectedAmenities.value = amenities;
+    update();
+  }
+
+  void updateHourlyRateFilter(double min, double max) {
+    minHourlyRate.value = min;
+    maxHourlyRate.value = max;
+    update();
+  }
+
+  void updatePricePerKwhFilter(double min, double max) {
+    minPricePerKwh.value = min;
+    maxPricePerKwh.value = max;
+    update();
+  }
+
   // Clear all filters
   void clearFilters() {
     searchQuery.value = '';
@@ -208,6 +308,11 @@ class HomeController extends GetxController {
     selectedVehicles.clear();
     selectedPorts.clear();
     selectedPaymentMethods.clear();
+    selectedAmenities.clear();
+    minHourlyRate.value = 0.0;
+    maxHourlyRate.value = double.infinity;
+    minPricePerKwh.value = 0.0;
+    maxPricePerKwh.value = double.infinity;
     maxDistance.value = 10.0;
     update();
   }
