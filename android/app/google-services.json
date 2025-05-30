@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "608224963108",
+    "project_id": "evigo-8a332",
+    "storage_bucket": "evigo-8a332.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:608224963108:android:9da588408f126cd7b406b1",
+        "android_client_info": {
+          "package_name": "com.example.nobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "608224963108-agih6a00u9lpfpg05djkjluqc01p9ng3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.nobile",
+            "certificate_hash": "6f5cb02d3237c28ae36f4049f2ecf7d6499e8d67"
+          }
+        },
+        {
+          "client_id": "608224963108-4e2flj2f5ove61p5q044ar9olnrra870.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBF524CEXFDmLue_9D6a8UuFcVP03_Njzs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "608224963108-4e2flj2f5ove61p5q044ar9olnrra870.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "608224963108-c2bj279gs3n9fehvld4fgjp1508pdnnb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.nobile"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

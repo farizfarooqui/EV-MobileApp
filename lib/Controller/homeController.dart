@@ -138,25 +138,26 @@ class HomeController extends GetxController {
     try {
       var query = _supabase.from('stations').select();
 
-      // Filter by charger types
+      // Add filters for charger types
       if (chargerTypes != null && chargerTypes.isNotEmpty) {
+        // Use contains operator for array fields
         query = query.contains('chargertypes', chargerTypes);
         log("Filtering by charger types: $chargerTypes");
       }
 
-      // Filter by amenities
+      // Add filters for amenities
       if (amenities != null && amenities.isNotEmpty) {
         query = query.contains('amenities', amenities);
         log("Filtering by amenities: $amenities");
       }
 
-      // Filter by payment methods
+      // Add filters for payment methods
       if (paymentMethods != null && paymentMethods.isNotEmpty) {
         query = query.contains('paymentmethods', paymentMethods);
         log("Filtering by payment methods: $paymentMethods");
       }
 
-      // Filter by hourly rate
+      // Add filters for hourly rate
       if (minHourlyRate != null) {
         query = query.gte('hourlyrate', minHourlyRate);
       }
@@ -165,7 +166,7 @@ class HomeController extends GetxController {
         query = query.lte('hourlyrate', maxHourlyRate);
       }
 
-      // Filter by price per kWh
+      // Add filters for price per kWh
       if (minPricePerKwh != null) {
         query = query.gte('priceperkwh', minPricePerKwh);
       }
@@ -173,6 +174,9 @@ class HomeController extends GetxController {
       if (maxPricePerKwh != null && maxPricePerKwh != double.infinity) {
         query = query.lte('priceperkwh', maxPricePerKwh);
       }
+
+      // Log the constructed query
+      log("Executing query: ${query.toString()}");
 
       // Execute the query
       final response = await query;
