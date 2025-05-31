@@ -21,11 +21,137 @@ class StationController extends GetxController {
   late StreamSubscription<QuerySnapshot> _stationsSubscription;
   final TextEditingController searchController = TextEditingController();
 
+  // Filter variables
+  final selectedChargerTypes = <String>[].obs;
+  final selectedAmenities = <String>[].obs;
+  final selectedPaymentMethods = <String>[].obs;
+  final minHourlyRate = 0.0.obs;
+  final maxHourlyRate = 100.0.obs;
+  final minPricePerKwh = 0.0.obs;
+  final maxPricePerKwh = 100.0.obs;
+  final openOnly = false.obs;
+  final availableOnly = false.obs;
+
+  // Update filter methods
+  void updateChargerTypeFilter(List<String> types) {
+    selectedChargerTypes.value = types;
+    applyFilters();
+  }
+
+  void updateAmenitiesFilter(List<String> amenities) {
+    selectedAmenities.value = amenities;
+    applyFilters();
+  }
+
+  void updatePaymentMethodFilter(List<String> methods) {
+    selectedPaymentMethods.value = methods;
+    applyFilters();
+  }
+
+  void updateHourlyRateFilter(double min, double max) {
+    minHourlyRate.value = min;
+    maxHourlyRate.value = max;
+    applyFilters();
+  }
+
+  void updatePricePerKwhFilter(double min, double max) {
+    minPricePerKwh.value = min;
+    maxPricePerKwh.value = max;
+    applyFilters();
+  }
+
+  void updateOpenOnly(bool value) {
+    openOnly.value = value;
+    applyFilters();
+  }
+
+  void updateAvailableOnly(bool value) {
+    availableOnly.value = value;
+    applyFilters();
+  }
+
+  void clearFilters() {
+    selectedChargerTypes.clear();
+    selectedAmenities.clear();
+    selectedPaymentMethods.clear();
+    minHourlyRate.value = 0.0;
+    maxHourlyRate.value = 100.0;
+    minPricePerKwh.value = 0.0;
+    maxPricePerKwh.value = 100.0;
+    openOnly.value = false;
+    availableOnly.value = false;
+    applyFilters();
+  }
+
+  void applyFilters() {
+    if (selectedChargerTypes.isEmpty &&
+        selectedAmenities.isEmpty &&
+        selectedPaymentMethods.isEmpty &&
+        minHourlyRate.value == 0.0 &&
+        maxHourlyRate.value == 100.0 &&
+        minPricePerKwh.value == 0.0 &&
+        maxPricePerKwh.value == 100.0 &&
+        !openOnly.value &&
+        !availableOnly.value) {
+      // If no filters are applied, show all stations
+      filteredStations.value = stations;
+      return;
+    }
+
+    filteredStations.value = stations.where((station) {
+      // Check charger types
+      if (selectedChargerTypes.isNotEmpty) {
+        final hasSelectedType = station.ports.any((port) =>
+            selectedChargerTypes.contains(port.type));
+        if (!hasSelectedType) return false;
+      }
+
+      // Check amenities
+      if (selectedAmenities.isNotEmpty) {
+        final hasAllAmenities = selectedAmenities.every(
+            (amenity) => station.amenities.contains(amenity));
+        if (!hasAllAmenities) return false;
+      }
+
+      // Check payment methods (assuming payment methods are stored in station data)
+      if (selectedPaymentMethods.isNotEmpty) {
+        // Add payment method check logic here
+        // This depends on how payment methods are stored in your station data
+      }
+
+      // Check hourly rate
+      final hasValidHourlyRate = station.ports.any((port) =>
+          port.pricing >= minHourlyRate.value &&
+          port.pricing <= maxHourlyRate.value);
+      if (!hasValidHourlyRate) return false;
+
+      // Check price per kWh
+      final hasValidPricePerKwh = station.ports.any((port) =>
+          port.pricing >= minPricePerKwh.value &&
+          port.pricing <= maxPricePerKwh.value);
+      if (!hasValidPricePerKwh) return false;
+
+      // Check if station is open (24/7 or has operating hours)
+      if (openOnly.value) {
+        // Add open/closed check logic here
+        // This depends on how operating hours are stored in your station data
+      }
+
+      // Check if station has available ports
+      if (availableOnly.value) {
+        final hasAvailablePorts = station.ports.any((port) =>
+            port.isActive && port.slots.any((slot) => !slot.isBooked));
+        if (!hasAvailablePorts) return false;
+      }
+
+      return true;
+    }).toList();
+  }
+
   Future<void> getCurrentLocation() async {
     try {
       var status = await Permission.location.request();
       if (status.isGranted) {
-        // Get current position
         Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high,
         );
@@ -84,7 +210,7 @@ class StationController extends GetxController {
   void filterStations(String query) {
     searchText.value = query;
     if (query.isEmpty) {
-      filteredStations.value = stations;
+      applyFilters(); // Apply existing filters
     } else {
       final filtered = stations.where((station) {
         final name = station.stationName.toLowerCase();

@@ -37,14 +37,15 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 90),
             child: FloatingActionButton(
               onPressed: () {
-                // showModalBottomSheet(
-                //   context: context,
-                //   isScrollControlled: true,
-                //   shape: const RoundedRectangleBorder(
-                //     borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                //   ),
-                //   builder: (context) => StationFilterSheet(),
-                // );
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                  ),
+                  builder: (context) => StationFilterSheet(),
+                );
               },
               backgroundColor: colorNavBar,
               child: const Icon(
