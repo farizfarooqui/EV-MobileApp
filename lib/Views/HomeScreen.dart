@@ -5,7 +5,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
-import 'package:nobile/Controller/StationListController.dart';
+import 'package:nobile/Controller/StationController.dart';
+import 'package:nobile/Model/StationModel.dart';
+import 'package:nobile/Views/StationDetailsScreen.dart';
 import 'package:nobile/Views/StationFilterSheet.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -22,8 +24,7 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16),
             child: FloatingActionButton(
               onPressed: () {
-                // homeController.getCurrentLocation();
-                //move on click only
+                controller.getCurrentLocation();
               },
               backgroundColor: colorNavBar,
               child: const Icon(
@@ -36,15 +37,14 @@ class HomeScreen extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 90),
             child: FloatingActionButton(
               onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(24)),
-                  ),
-                  builder: (context) => StationFilterSheet(),
-                );
+                // showModalBottomSheet(
+                //   context: context,
+                //   isScrollControlled: true,
+                //   shape: const RoundedRectangleBorder(
+                //     borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                //   ),
+                //   builder: (context) => StationFilterSheet(),
+                // );
               },
               backgroundColor: colorNavBar,
               child: const Icon(
@@ -97,7 +97,7 @@ class HomeScreen extends StatelessWidget {
               // Station Markers
               Obx(
                 () => MarkerLayer(
-                  markers: controller.stations.map((station) {
+                  markers: controller.filteredStations.map((station) {
                     return Marker(
                       point: LatLng(station.location.latitude,
                           station.location.longitude),
@@ -119,7 +119,7 @@ class HomeScreen extends StatelessWidget {
                               maxChildSize: 0.9,
                               builder: (_, scrollController) =>
                                   StationDetailSheet(
-                                station: station.toJson(),
+                                stationJson: station.toJson(),
                                 scrollController: scrollController,
                               ),
                             ),
@@ -146,75 +146,134 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
-          // Floating Search Icon
-          Obx(() => !controller.showSearch.value
-              ? Positioned(
-                  top: MediaQuery.of(context).padding.top + 16,
-                  right: 24,
-                  child: Material(
-                    color: Colors.transparent,
-                    shape: const CircleBorder(),
-                    elevation: 6,
-                    child: InkWell(
-                      customBorder: const CircleBorder(),
-                      // onTap: controller.showSearchBar,
-                      child: Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context)
-                                  .shadowColor
-                                  .withOpacity(0.15),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
+          // Search Bar
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 16,
+            left: 16,
+            right: 16,
+            child: Obx(() => controller.showSearch.value
+                ? Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              Theme.of(context).shadowColor.withOpacity(0.15),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: controller.searchController,
+                            autofocus: true,
+                            decoration: const InputDecoration(
+                              hintText: 'Search stations...',
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
                             ),
-                          ],
-                          border: Border.all(
-                            color: Theme.of(context)
-                                .dividerColor
-                                .withOpacity(0.15),
-                            width: 1.5,
+                            onChanged: (value) {
+                              controller.filterStations(value);
+                            },
                           ),
                         ),
-                        child: Icon(Icons.search,
-                            color: Theme.of(context).iconTheme.color),
-                      ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            controller.searchController.clear();
+                            controller.showSearch.value = false;
+                            controller.filterStations('');
+                          },
+                        ),
+                      ],
                     ),
-                  ),
-                )
-              : const SizedBox.shrink()),
-          // Search Bar
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Material(
+                        color: Colors.transparent,
+                        shape: const CircleBorder(),
+                        elevation: 6,
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          onTap: () {
+                            controller.showSearch.value = true;
+                            controller.searchController.clear();
+                            controller.filterStations('');
+                          },
+                          child: Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Theme.of(context)
+                                      .shadowColor
+                                      .withOpacity(0.15),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                              border: Border.all(
+                                color: Theme.of(context)
+                                    .dividerColor
+                                    .withOpacity(0.15),
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Icon(Icons.search,
+                                color: Theme.of(context).iconTheme.color),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )),
+          ),
+          // Search Results
           Obx(() => controller.showSearch.value
               ? Positioned(
-                  top: MediaQuery.of(context).padding.top + 16,
+                  top: MediaQuery.of(context).padding.top + 80,
                   left: 16,
                   right: 16,
-                  child: Column(
-                    children: [
-                      TextField(
-                        decoration: const InputDecoration(
-                          labelText: 'Search by name',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.search),
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              Theme.of(context).shadowColor.withOpacity(0.15),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
                         ),
-                        onChanged: controller.filterStations,
-                      ),
-                      const SizedBox(height: 20),
-                      Expanded(
-                        child: Obx(() {
-                          final stations = controller.filteredStations;
-                          if (stations.isEmpty) {
-                            return const Center(
-                                child: Text('No stations found'));
-                          }
-                          return ListView.builder(
-                            itemCount: stations.length,
+                      ],
+                    ),
+                    child: controller.filteredStations.isEmpty
+                        ? const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Text('No stations found'),
+                            ),
+                          )
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: controller.filteredStations.length,
                             itemBuilder: (context, index) {
-                              final station = stations[index];
+                              final station =
+                                  controller.filteredStations[index];
                               return ListTile(
                                 leading: Icon(
                                   station.verified
@@ -225,19 +284,16 @@ class HomeScreen extends StatelessWidget {
                                       : Colors.red,
                                 ),
                                 title: Text(station.stationName),
-                                subtitle: Text(
-                                    '${station.city}, ${station.state}, ${station.country}'),
-                                trailing: const Icon(Icons.arrow_forward_ios),
+                                subtitle:
+                                    Text('${station.city}, ${station.state}'),
                                 onTap: () {
-                                  // close and move map to its location on map
+                                  controller.goToStation(station.toJson());
+                                  controller.showSearch.value = false;
+                                  controller.searchController.clear();
                                 },
                               );
                             },
-                          );
-                        }),
-                      ),
-                      //
-                    ],
+                          ),
                   ),
                 )
               : const SizedBox.shrink()),
@@ -248,20 +304,20 @@ class HomeScreen extends StatelessWidget {
 }
 
 class StationDetailSheet extends StatelessWidget {
-  final Map<String, dynamic> station;
+  final Map<String, dynamic> stationJson;
   final ScrollController scrollController;
+  final StationController controller = Get.find();
 
-  const StationDetailSheet({
+  StationDetailSheet({
     super.key,
-    required this.station,
+    required this.stationJson,
     required this.scrollController,
   });
 
+  ChargingStation get station => ChargingStation.fromJson(stationJson);
+
   @override
   Widget build(BuildContext context) {
-    final List<String> chargerTypes = List<String>.from(station[''] ?? []);
-    final int available = station[''] ?? 0;
-
     return SingleChildScrollView(
       controller: scrollController,
       child: Padding(
@@ -291,40 +347,51 @@ class StationDetailSheet extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        station['name'] ?? 'Unknown',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: colorPrimary,
+                      GestureDetector(
+                        onTap: () {
+                          Get.to(() => StationDetailsScreen(station: station));
+                        },
+                        child: Row(
+                          children: [
+                            Text(
+                              station.stationName,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: colorPrimary,
+                              ),
+                            ),
+                            const Icon(Icons.arrow_forward_ios_outlined)
+                          ],
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        station['address'] ?? '',
+                        '${station.address}, ${station.city}',
                         style: const TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 8),
-                      const Row(
+                      Row(
                         children: [
                           Chip(
-                            label: const Text(
-                              'OPEN',
-                              style: TextStyle(
+                            label: Text(
+                              station.verified ? 'VERIFIED' : 'UNVERIFIED',
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 10,
                               ),
                             ),
-                            backgroundColor: Colors.green,
+                            backgroundColor:
+                                station.verified ? Colors.green : Colors.red,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 6, vertical: 0),
                             materialTapTargetSize:
                                 MaterialTapTargetSize.shrinkWrap,
-                            visualDensity:
-                                VisualDensity(horizontal: 0, vertical: -4),
+                            visualDensity: const VisualDensity(
+                                horizontal: 0, vertical: -4),
                           ),
-                          SizedBox(width: 8),
-                          Text('24/7'),
+                          const SizedBox(width: 8),
+                          const Text('24/7'),
                         ],
                       ),
                     ],
@@ -334,91 +401,94 @@ class StationDetailSheet extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            /// Reserve / Report
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
+            /// Station Status
+            GetX<StationController>(
+              builder: (controller) {
+                // Find the current station in the controller's stations list
+                final currentStation = controller.stations.firstWhereOrNull(
+                  (s) => s.id == station.id,
+                );
+
+                // If station not found in controller, use the passed station
+                final stationToUse = currentStation ?? station;
+
+                final availablePorts =
+                    stationToUse.ports.where((port) => port.isActive).length;
+                final totalPorts = stationToUse.ports.length;
+                final occupiedPorts = stationToUse.ports
+                    .where((port) => port.slots.any((slot) => slot.isBooked))
+                    .length;
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(Icons.event_available, size: 20, color: colorPrimary),
-                    SizedBox(width: 4),
-                    Text("Reserve a spot"),
-                    SizedBox(width: 8),
-                    Chip(
-                      label: const Text(
-                        'New',
-                        style: TextStyle(color: Colors.white, fontSize: 10),
-                      ),
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 0),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      visualDensity: VisualDensity(horizontal: 0, vertical: -4),
-                    )
+                    _statusChip("Available", availablePorts, Colors.blue[900]!),
+                    _statusChip("Occupied", occupiedPorts, Colors.amber[700]!),
+                    _statusChip("Total", totalPorts, Colors.grey[700]!),
                   ],
-                ),
-                Icon(Icons.help_outline, size: 20),
-              ],
-            ),
-            const SizedBox(height: 8),
-            GestureDetector(
-              onTap: () {
-                // Report issue
+                );
               },
-              child: const Row(
-                children: [
-                  Icon(Icons.report_problem_outlined, size: 20),
-                  SizedBox(width: 8),
-                  Text("Report an issue"),
-                ],
-              ),
             ),
 
             const SizedBox(height: 16),
-
-            /// Availability Chips
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _statusChip("Available", available, Colors.blue[900]!),
-                _statusChip("Occupied", 0, Colors.amber[700]!),
-                _statusChip("Unavailable", 0, Colors.red),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
             const Divider(),
 
-            /// Charger Type List (from strings)
-            ...chargerTypes.map((type) => Column(
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.electric_bolt, size: 20),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            type,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                        const Icon(Icons.chevron_right),
-                      ],
-                    ),
-                    const Divider(),
-                  ],
-                )),
+            /// Charging Ports
+            const Text(
+              'Charging Ports',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            GetX<StationController>(
+              builder: (controller) {
+                final currentStation = controller.stations.firstWhereOrNull(
+                  (s) => s.id == station.id,
+                );
+                final stationToUse = currentStation ?? station;
+
+                return Column(
+                  children: stationToUse.ports
+                      .map((port) => _buildPortCard(port))
+                      .toList(),
+                );
+              },
+            ),
 
             const SizedBox(height: 16),
+            const Divider(),
 
-            /// Bottom "Navigate" Button
+            /// Amenities
+            if (station.amenities.isNotEmpty) ...[
+              const Text(
+                'Amenities',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: station.amenities
+                    .map((amenity) => Chip(
+                          label: Text(amenity),
+                          backgroundColor: colorPrimary.withOpacity(0.1),
+                          labelStyle: TextStyle(color: colorPrimary),
+                        ))
+                    .toList(),
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            /// Action Buttons
             ElevatedButton(
               onPressed: () {
-                // Navigate
+                controller.goToStation(stationJson);
+                Get.back();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorPrimary,
@@ -429,18 +499,76 @@ class StationDetailSheet extends StatelessWidget {
                 style: TextStyle(color: Colors.white),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             ElevatedButton(
               onPressed: () {
-                //
+                Get.to(() => StationDetailsScreen(station: station));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorPrimary,
                 minimumSize: const Size(double.infinity, 50),
               ),
               child: const Text(
-                'Book',
+                'Book Now',
                 style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPortCard(ChargingPort port) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  port.type,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: port.isActive ? Colors.green : Colors.red,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    port.isActive ? 'Active' : 'Inactive',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Price: \$${port.pricing.toStringAsFixed(2)}/kWh'),
+                Text('${port.slotsPerDay} slots/day'),
+              ],
+            ),
+            const SizedBox(height: 8),
+            LinearProgressIndicator(
+              value: port.slots.where((slot) => slot.isBooked).length /
+                  port.slots.length,
+              backgroundColor: Colors.grey[200],
+              valueColor: AlwaysStoppedAnimation<Color>(
+                port.isActive ? Colors.green : Colors.red,
               ),
             ),
           ],

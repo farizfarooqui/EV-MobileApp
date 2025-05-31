@@ -43,10 +43,20 @@ class StationController extends GetxController {
   }
 
   void goToStation(Map<String, dynamic> station) {
-    mapController.move(
-      LatLng(station['latitude'], station['longitude']),
-      16.0,
-    );
+    try {
+      final location = station['location'] as GeoPoint;
+      mapController.move(
+        LatLng(location.latitude, location.longitude),
+        16.0,
+      );
+    } catch (e) {
+      log("Error moving to station: ${e.toString()}");
+      Get.snackbar(
+        'Error',
+        'Could not navigate to station location',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 
   void getStationsStream() {
@@ -78,9 +88,7 @@ class StationController extends GetxController {
     } else {
       final filtered = stations.where((station) {
         final name = station.stationName.toLowerCase();
-        final city = station.city.toLowerCase();
-        return name.contains(query.toLowerCase()) ||
-            city.contains(query.toLowerCase());
+        return name.contains(query.toLowerCase());
       }).toList();
       filteredStations.value = filtered;
     }
