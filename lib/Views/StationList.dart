@@ -18,7 +18,7 @@ class FetchStationsScreen extends StatelessWidget {
           children: [
             TextField(
               decoration: const InputDecoration(
-                labelText: 'Search by name or city',
+                labelText: 'Search by name',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.search),
               ),
@@ -37,22 +37,18 @@ class FetchStationsScreen extends StatelessWidget {
                   itemCount: stations.length,
                   itemBuilder: (context, index) {
                     final station = stations[index];
-                    return Card(
-                      elevation: 4,
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: ListTile(
-                        leading: Icon(
-                          station.verified ? Icons.check_circle : Icons.cancel,
-                          color: station.verified ? Colors.green : Colors.red,
-                        ),
-                        title: Text(station.stationName),
-                        subtitle: Text(
-                            '${station.city}, ${station.state}, ${station.country}'),
-                        trailing: const Icon(Icons.arrow_forward_ios),
-                        onTap: () {
-                          Get.to(() => StationDetailsScreen(station: station));
-                        },
+                    return ListTile(
+                      leading: Icon(
+                        station.verified ? Icons.check_circle : Icons.cancel,
+                        color: station.verified ? Colors.green : Colors.red,
                       ),
+                      title: Text(station.stationName),
+                      subtitle: Text(
+                          '${station.city}, ${station.state}, ${station.country}'),
+                      trailing: const Icon(Icons.arrow_forward_ios),
+                      onTap: () {
+                        Get.to(() => StationDetailsScreen(station: station));
+                      },
                     );
                   },
                 );

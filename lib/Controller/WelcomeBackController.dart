@@ -49,18 +49,38 @@ class WelcomeScreenController extends GetxController {
         password: passwordController.text,
       );
 
-      final String? token = await userCredential.user?.getIdToken();
-      if (token != null) {
-        onSuccess(token);
+      final User? user = userCredential.user;
+
+      if (user != null) {
+        final String? token = await user.getIdToken();
+
+        if (token == null) throw Exception('Token is null');
+
+        //fetch user data from Firestore
+        final DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        if (!userDoc.exists) {
+          throw Exception("User document does not exist.");
+        }
+
+        final userData = userDoc.data() as Map<String, dynamic>;
+        Get.offAll(() => MainNavBar(), transition: Transition.fade, arguments: {
+          'userData': userData,
+        });
       } else {
-        throw Exception('Token is null');
+        throw Exception("User is null after login.");
       }
     } catch (e) {
       if (e is FirebaseAuthException) {
         // ErrorHandlerText.firebaseError(e);
+        Utils.showError('Login Failed', e.message ?? 'Authentication failed.');
       } else {
         Utils.showError('Login Failed', 'An unexpected error occurred.');
       }
+    } finally {
       isLoading(false);
     }
   }

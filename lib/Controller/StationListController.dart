@@ -1,30 +1,55 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:nobile/Model/StationModel.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class StationController extends GetxController {
   final stations = <ChargingStation>[].obs;
   final filteredStations = <ChargingStation>[].obs;
   final isLoading = false.obs;
   RxString searchText = ''.obs;
-
+  final RxBool showSearch = false.obs;
+  final Rx<Position?> currentPosition = Rx<Position?>(null);
+  late final MapController mapController;
   late StreamSubscription<QuerySnapshot> _stationsSubscription;
+  final TextEditingController searchController = TextEditingController();
 
-  @override
-  void onInit() {
-    super.onInit();
-    _setupStationsStream();
+  Future<void> getCurrentLocation() async {
+    try {
+      var status = await Permission.location.request();
+      if (status.isGranted) {
+        // Get current position
+        Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        );
+        currentPosition.value = position;
+        mapController.move(
+          LatLng(position.latitude, position.longitude),
+          16.0,
+        );
+      } else {
+        log("Please grant location permission to use this feature.");
+      }
+    } catch (e) {
+      log("Error getting location: ${e.toString()}");
+    }
   }
 
-  @override
-  void onClose() {
-    _stationsSubscription.cancel();
-    super.onClose();
+  void goToStation(Map<String, dynamic> station) {
+    mapController.move(
+      LatLng(station['latitude'], station['longitude']),
+      16.0,
+    );
   }
 
-  void _setupStationsStream() {
+  void getStationsStream() {
     _stationsSubscription = FirebaseFirestore.instance
         .collection('chargingStations')
         .snapshots()
@@ -80,19 +105,16 @@ class StationController extends GetxController {
     return stations.fold(0, (sum, station) => sum + station.numberOfPorts);
   }
 
-  // Get number of available ports (ports that are not booked)
-  int get availablePorts {
-    return stations.fold(0, (sum, station) {
-      return sum +
-          station.ports.fold(0, (portSum, port) {
-            return portSum + port.slots.where((slot) => !slot.isBooked).length;
-          });
-    });
+  @override
+  void onInit() {
+    super.onInit();
+    getStationsStream();
+    mapController = MapController();
   }
 
-  // Calculate percentage change in stations since last month
-  double get stationGrowthPercentage {
-    // This is a placeholder. In a real app, you would compare with historical data
-    return 12.0; // Example: 12% growth
+  @override
+  void onClose() {
+    _stationsSubscription.cancel();
+    super.onClose();
   }
 }

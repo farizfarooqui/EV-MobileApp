@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nobile/Controller/homeController.dart';
 import 'package:nobile/Constants/Constants.dart';
+import 'package:nobile/Controller/StationListController.dart';
 
 class StationFilterSheet extends StatelessWidget {
   StationFilterSheet({super.key});
-  final HomeController controller = Get.find();
+  final StationController controller = Get.find();
 
   // Placeholder lists (replace with your actual data if available)
   final List<Map<String, dynamic>> connectorTypes = const [

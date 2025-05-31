@@ -5,13 +5,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
-import 'package:nobile/Controller/homeController.dart';
+import 'package:nobile/Controller/StationListController.dart';
 import 'package:nobile/Views/StationFilterSheet.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
-
-  final HomeController homeController = Get.put(HomeController());
+  final StationController controller = Get.put(StationController());
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +60,7 @@ class HomeScreen extends StatelessWidget {
         children: [
           // Map Layer
           FlutterMap(
-            mapController: homeController.mapController,
+            mapController: controller.mapController,
             options: const MapOptions(
               initialCenter: LatLng(24.884928, 67.058579),
               initialZoom: 12,
@@ -78,7 +77,7 @@ class HomeScreen extends StatelessWidget {
               ),
               // Current Location Marker
               Obx(() {
-                final position = homeController.currentPosition.value;
+                final position = controller.currentPosition.value;
                 if (position == null) return const SizedBox.shrink();
                 return MarkerLayer(
                   markers: [
@@ -98,9 +97,10 @@ class HomeScreen extends StatelessWidget {
               // Station Markers
               Obx(
                 () => MarkerLayer(
-                  markers: homeController.stations.map((station) {
+                  markers: controller.stations.map((station) {
                     return Marker(
-                      point: LatLng(station.latitude, station.longitude),
+                      point: LatLng(station.location.latitude,
+                          station.location.longitude),
                       width: 40.0,
                       height: 40.0,
                       child: GestureDetector(
@@ -147,7 +147,7 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           // Floating Search Icon
-          Obx(() => !homeController.showSearch.value
+          Obx(() => !controller.showSearch.value
               ? Positioned(
                   top: MediaQuery.of(context).padding.top + 16,
                   right: 24,
@@ -157,7 +157,7 @@ class HomeScreen extends StatelessWidget {
                     elevation: 6,
                     child: InkWell(
                       customBorder: const CircleBorder(),
-                      onTap: homeController.showSearchBar,
+                      // onTap: controller.showSearchBar,
                       child: Container(
                         width: 48,
                         height: 48,
@@ -188,73 +188,55 @@ class HomeScreen extends StatelessWidget {
                 )
               : const SizedBox.shrink()),
           // Search Bar
-          Obx(() => homeController.showSearch.value
+          Obx(() => controller.showSearch.value
               ? Positioned(
                   top: MediaQuery.of(context).padding.top + 16,
                   left: 16,
                   right: 16,
                   child: Column(
                     children: [
-                      Material(
-                        elevation: 8,
-                        borderRadius: BorderRadius.circular(32),
-                        child: TextField(
-                          controller: homeController.searchController,
-                          autofocus: true,
-                          onChanged: homeController.onSearchChanged,
-                          decoration: InputDecoration(
-                            hintText: 'Search by station',
-                            prefixIcon: const Icon(Icons.search),
-                            suffixIcon: IconButton(
-                              icon: const Icon(Icons.close),
-                              onPressed: homeController.hideSearchBar,
-                            ),
-                            filled: true,
-                            fillColor: Theme.of(context).cardColor,
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 0, horizontal: 16),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(32),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
+                      TextField(
+                        decoration: const InputDecoration(
+                          labelText: 'Search by name',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.search),
                         ),
+                        onChanged: controller.filterStations,
                       ),
-                      homeController.searchController.text.isNotEmpty &&
-                              homeController.searchResults.isNotEmpty
-                          ? Container(
-                              margin: const EdgeInsets.only(top: 8),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).cardColor,
-                                borderRadius: BorderRadius.circular(24),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Theme.of(context)
-                                        .shadowColor
-                                        .withOpacity(0.1),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: ListView.separated(
-                                shrinkWrap: true,
-                                itemCount: homeController.searchResults.length,
-                                separatorBuilder: (_, __) =>
-                                    const Divider(height: 1),
-                                itemBuilder: (context, index) {
-                                  final station =
-                                      homeController.searchResults[index];
-                                  return ListTile(
-                                    title: Text(station['name'] ?? ''),
-                                    subtitle: Text(station['address'] ?? ''),
-                                    onTap: () =>
-                                        homeController.goToStation(station),
-                                  );
+                      const SizedBox(height: 20),
+                      Expanded(
+                        child: Obx(() {
+                          final stations = controller.filteredStations;
+                          if (stations.isEmpty) {
+                            return const Center(
+                                child: Text('No stations found'));
+                          }
+                          return ListView.builder(
+                            itemCount: stations.length,
+                            itemBuilder: (context, index) {
+                              final station = stations[index];
+                              return ListTile(
+                                leading: Icon(
+                                  station.verified
+                                      ? Icons.check_circle
+                                      : Icons.cancel,
+                                  color: station.verified
+                                      ? Colors.green
+                                      : Colors.red,
+                                ),
+                                title: Text(station.stationName),
+                                subtitle: Text(
+                                    '${station.city}, ${station.state}, ${station.country}'),
+                                trailing: const Icon(Icons.arrow_forward_ios),
+                                onTap: () {
+                                  // close and move map to its location on map
                                 },
-                              ),
-                            )
-                          : const SizedBox.shrink()
+                              );
+                            },
+                          );
+                        }),
+                      ),
+                      //
                     ],
                   ),
                 )
@@ -277,9 +259,8 @@ class StationDetailSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> chargerTypes =
-        List<String>.from(station['charger_types'] ?? []);
-    final int available = station['total_charging_ports'] ?? 0;
+    final List<String> chargerTypes = List<String>.from(station[''] ?? []);
+    final int available = station[''] ?? 0;
 
     return SingleChildScrollView(
       controller: scrollController,
