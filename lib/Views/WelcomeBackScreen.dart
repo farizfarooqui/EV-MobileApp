@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
 import 'package:nobile/Controller/WelcomeBackController.dart';
+import 'package:nobile/Views/LoginWithEmail.dart';
 import 'package:nobile/Views/Widgets/SmallLoader.dart';
 import 'package:nobile/Views/Widgets/CustomElevatedButton.dart';
 import 'package:nobile/Views/Widgets/SocialMediaButton.dart';
@@ -47,7 +48,7 @@ class WelcomeBackScreen extends StatelessWidget {
               CustomElevatedButton(
                   text: "login_with_email",
                   onpress: () {
-                    // Get.to(() => const EmailLoginScreen());
+                    Get.to(() => LoginWithEmailScreen());
                   }),
               const SizedBox(height: 16.0),
               CustomElevatedButton(

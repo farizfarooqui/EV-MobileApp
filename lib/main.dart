@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
+import 'package:nobile/Views/StationList.dart';
 import 'package:nobile/Views/WelcomeBackScreen.dart';
 import 'package:nobile/firebase_options.dart';
 import 'package:nobile/supabase_client.dart';
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
       ),
       themeMode: themeController.themeMode,
       home: WelcomeBackScreen(),
+      // home: FetchStationsScreen(),
     );
   }
 }

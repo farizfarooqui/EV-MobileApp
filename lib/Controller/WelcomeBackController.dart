@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:math' as Math;
-import 'package:dio/dio.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:nobile/Constants/Utils.dart';
+import 'package:nobile/Views/CreateAccountScreen.dart';
 import 'package:nobile/Views/HomeScreen.dart';
 import 'package:nobile/Views/MainNavBar.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -28,7 +28,7 @@ class WelcomeScreenController extends GetxController {
   }
 
   void goToSignupScreen() {
-    // Get.to(() => CreateAccountScreen(), transition: Transition.rightToLeft);
+    Get.to(() => CreateAccountScreen(), transition: Transition.rightToLeft);
   }
 
   void goToForgetScreen() {
@@ -51,8 +51,7 @@ class WelcomeScreenController extends GetxController {
 
       final String? token = await userCredential.user?.getIdToken();
       if (token != null) {
-        // onSuccess(token);
-        Get.offAll(HomeScreen());
+        onSuccess(token);
       } else {
         throw Exception('Token is null');
       }
@@ -98,8 +97,7 @@ class WelcomeScreenController extends GetxController {
 
       var user = await FirebaseAuth.instance.signInWithCredential(credential);
       var token = await user.user?.getIdToken();
-      // onSuccess(token);
-      Get.offAll(MainNavBar());
+      onSuccess(token!);
 
       log('Firebase Sign-In successful. User UID: ${user.user!.uid}');
     } catch (error) {
@@ -142,13 +140,50 @@ class WelcomeScreenController extends GetxController {
             await FirebaseAuth.instance.signInWithCredential(oauthCredential);
         String? token = await userCredential.user!.getIdToken();
         if (token != null) {
-          // onSuccess(token);
+          onSuccess(token);
         }
       } catch (e) {
         print("--------------------- Apple Error $e");
       } finally {
         isAppleLoading.value = false;
       }
+    }
+  }
+
+  void onSuccess(String token) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        throw Exception("User not found after sign up.");
+      }
+
+      // Prepare user data
+      final userData = {
+        'uid': user.uid,
+        'email': user.email,
+        'createdAt': Timestamp.now(),
+        'isVerified': user.emailVerified,
+      };
+
+      // Save user data to Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .set(userData);
+
+      // Navigate to home screen
+      Get.offAll(() => MainNavBar(),
+          transition: Transition.rightToLeft,
+          arguments: {
+            'userData': userData,
+          });
+    } catch (error) {
+      log('[SignUp] Error occurred: $error');
+      Utils.showError(
+          "Signup Failed", "There was an error while processing the request.");
+    } finally {
+      isLoading(false);
     }
   }
 
