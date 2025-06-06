@@ -42,7 +42,8 @@ class HomeScreen extends StatelessWidget {
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
                   shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(24)),
                   ),
                   builder: (context) => StationFilterSheet(),
                 );
@@ -350,7 +351,9 @@ class StationDetailSheet extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Get.to(() => StationDetailsScreen(station: station));
+                          Get.to(() =>
+                              StationDetailsScreen(stationId: station.id));
+                          log("Station Id : ${station.id}");
                         },
                         child: Row(
                           children: [
@@ -503,7 +506,8 @@ class StationDetailSheet extends StatelessWidget {
             const SizedBox(height: 12),
             ElevatedButton(
               onPressed: () {
-                Get.to(() => StationDetailsScreen(station: station));
+                Get.to(() => StationDetailsScreen(stationId: station.id));
+                log("Station Id : ${station.id}");
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorPrimary,

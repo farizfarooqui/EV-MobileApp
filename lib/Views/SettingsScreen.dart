@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Controller/theme_controller.dart';
 import 'package:nobile/Views/AppearanceScreen.dart';
+import 'package:nobile/Views/LogoutScreen.dart';
 
 class SettingsScreen extends StatelessWidget {
   SettingsScreen({super.key});
@@ -39,7 +40,11 @@ class SettingsScreen extends StatelessWidget {
                           Get.to(() => AppearanceScreen());
                         }),
                     _ProfileRow(
-                        icon: Icons.logout, text: 'Log out', onTap: () {}),
+                        icon: Icons.logout,
+                        text: 'Log out',
+                        onTap: () {
+                          Get.to(const LogoutScreen());
+                        }),
                   ],
                 ),
               ),

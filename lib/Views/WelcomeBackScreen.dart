@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
 import 'package:nobile/Controller/WelcomeBackController.dart';
@@ -27,7 +28,7 @@ class WelcomeBackScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(),
-              Text(
+              const Text(
                 "Welcome Back",
                 style: TextStyle(
                     color: colorBlack,
@@ -36,7 +37,7 @@ class WelcomeBackScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8.0),
-              Text(
+              const Text(
                 "login with phone text",
                 style: TextStyle(
                     color: colorBlack,
@@ -64,7 +65,7 @@ class WelcomeBackScreen extends StatelessWidget {
                   () => CustomElevatedButton(
                     backgroundColor: colorBlack,
                     text: "Login with Apple ID",
-                    iconPath: "assets/icons/iphoneicon.svg",
+                    iconPath: "assets/SVG/iphoneicon.svg",
                     textColor: Colors.black,
                     loading: controller.isAppleLoading.value,
                     onpress: controller.signInWithApple,
@@ -72,7 +73,7 @@ class WelcomeBackScreen extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: 32.0),
-              Row(
+              const Row(
                 children: <Widget>[
                   Expanded(
                     child: Divider(
@@ -81,7 +82,7 @@ class WelcomeBackScreen extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                         horizontal: 10), // Space around the 'or' text
                     child: Text(
                       "or",
@@ -102,7 +103,7 @@ class WelcomeBackScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   SocialMediaButton(
-                    assetName: "assets/icons/social/facebook.svg",
+                    assetName: "assets/SVG/facebook.svg",
                     onTap: () {
                       // controller.loginWithFacebook();
                     },
@@ -113,11 +114,23 @@ class WelcomeBackScreen extends StatelessWidget {
                       controller.loginWithGoogle();
                     },
                   ),
+                  // ElevatedButton(
+                  //     onPressed: () {},
+                  //     child: Row(
+                  //       children: [
+                  //         const Text('Login with Google'),
+                  //         SvgPicture.asset(
+                  //           'assets/icons/google.svg',
+                  //           color: colorPrimary,
+                  //           height: 30,
+                  //         )
+                  //       ],
+                  //     ))
                   // Obx(
                   //   () => controller.isLoading.value
                   //       ? const SmallLoader()
                   //       : SocialMediaButton(
-                  //           assetName: "assets/icons/G.svg",
+                  //           assetName: "assets/SVG/google.svg",
                   //           onTap: () {
                   //             controller.loginWithGoogle();
                   //           },

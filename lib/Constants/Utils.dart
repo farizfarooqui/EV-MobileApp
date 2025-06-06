@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
@@ -16,6 +17,15 @@ class Utils {
       duration: const Duration(seconds: 3),
       snackStyle: SnackStyle.GROUNDED,
     ));
+  }
+
+  static Future<bool> checkInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } catch (e) {
+      return false;
+    }
   }
 
   static void showSnackbar(String message) {
