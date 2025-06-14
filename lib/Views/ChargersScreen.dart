@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:nobile/Controller/main_nav_controller.dart';
 
 class ChargersScreen extends StatelessWidget {
-  const ChargersScreen({super.key});
+  final MainNavController navController = Get.put(MainNavController());
+
+  ChargersScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +21,7 @@ class ChargersScreen extends StatelessWidget {
                 const SizedBox(height: 12),
                 Center(
                   child: Text(
-                    'HELLO FARIZ 👋',
+                    navController.userData['name'] + " 👋",
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.2,

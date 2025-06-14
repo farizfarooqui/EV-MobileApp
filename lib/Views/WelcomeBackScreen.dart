@@ -1,14 +1,12 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
 import 'package:nobile/Controller/WelcomeBackController.dart';
 import 'package:nobile/Views/LoginWithEmail.dart';
-import 'package:nobile/Views/Widgets/SmallLoader.dart';
 import 'package:nobile/Views/Widgets/CustomElevatedButton.dart';
+import 'package:nobile/Views/Widgets/SmallLoader.dart';
 import 'package:nobile/Views/Widgets/SocialMediaButton.dart';
 
 class WelcomeBackScreen extends StatelessWidget {
@@ -21,124 +19,135 @@ class WelcomeBackScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: colorSecondary,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Spacer(),
+              SizedBox(height: Get.height * 0.2),
               const Text(
-                "Welcome Back",
+                "Welcome Back 👋",
                 style: TextStyle(
-                    color: colorBlack,
-                    fontSize: 32.0,
-                    fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8.0),
-              const Text(
-                "login with phone text",
-                style: TextStyle(
-                    color: colorBlack,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w400),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 48.0),
-              CustomElevatedButton(
-                  text: "login_with_email",
-                  onpress: () {
-                    Get.to(() => LoginWithEmailScreen());
-                  }),
-              const SizedBox(height: 16.0),
-              CustomElevatedButton(
-                  backgroundColor: colorNavBar,
-                  text: "login_with_phone",
-                  textColor: colorBlack,
-                  onpress: () {
-                    // Get.to(() => LoginWithPhoneScreen());
-                  }),
-              if (Platform.isIOS) ...[
-                const SizedBox(height: 16.0),
-                Obx(
-                  () => CustomElevatedButton(
-                    backgroundColor: colorBlack,
-                    text: "Login with Apple ID",
-                    iconPath: "assets/SVG/iphoneicon.svg",
-                    textColor: Colors.black,
-                    loading: controller.isAppleLoading.value,
-                    onpress: controller.signInWithApple,
-                  ),
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: colorBlack,
                 ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                "Login to continue using your account",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: colorBlack,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40),
+
+              /// Login Options
+              CustomElevatedButton(
+                text: "Login with Email",
+                iconPath: "assets/SVG/email.svg",
+                onpress: () => Get.to(() => LoginWithEmailScreen()),
+              ),
+              const SizedBox(height: 16),
+              CustomElevatedButton(
+                backgroundColor: colorNavBar,
+                text: "Login with Phone",
+                iconPath: "assets/SVG/Phone.svg",
+                textColor: colorBlack,
+                onpress: () {
+                  // Get.to(() => LoginWithPhoneScreen());
+                },
+              ),
+              if (Platform.isIOS) ...[
+                const SizedBox(height: 16),
+                Obx(() => CustomElevatedButton(
+                      backgroundColor: Colors.black,
+                      text: "Login with Apple ID",
+                      iconPath: "assets/SVG/iphoneicon.svg",
+                      textColor: Colors.white,
+                      loading: controller.isAppleLoading.value,
+                      onpress: controller.signInWithApple,
+                    )),
               ],
-              const SizedBox(height: 32.0),
+              const SizedBox(height: 32),
+
+              /// Divider
               const Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Divider(
-                      color: colorBlack,
-                      thickness: 1, // Set the thickness of the divider
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 10), // Space around the 'or' text
-                    child: Text(
-                      "or",
-                      style: TextStyle(
-                          color: colorBlack, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Expanded(
-                    child: Divider(
-                      color: colorBlack,
-                      thickness: 1, // Set the thickness of the divider
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 32.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  SocialMediaButton(
-                    assetName: "assets/SVG/facebook.svg",
-                    onTap: () {
-                      // controller.loginWithFacebook();
-                    },
+                  Expanded(child: Divider(color: colorBlack)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text("OR",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: colorBlack)),
                   ),
-                  SocialMediaButton(
-                    assetName: "assets/icons/google.svg",
-                    onTap: () {
-                      controller.loginWithGoogle();
-                    },
-                  ),
-                  // ElevatedButton(
-                  //     onPressed: () {},
-                  //     child: Row(
-                  //       children: [
-                  //         const Text('Login with Google'),
-                  //         SvgPicture.asset(
-                  //           'assets/icons/google.svg',
-                  //           color: colorPrimary,
-                  //           height: 30,
-                  //         )
-                  //       ],
-                  //     ))
-                  // Obx(
-                  //   () => controller.isLoading.value
-                  //       ? const SmallLoader()
-                  //       : SocialMediaButton(
-                  //           assetName: "assets/SVG/google.svg",
-                  //           onTap: () {
-                  //             controller.loginWithGoogle();
-                  //           },
-                  //         ),
-                  // ),
+                  Expanded(child: Divider(color: colorBlack)),
                 ],
               ),
-              const Spacer(),
+              const SizedBox(height: 24),
+
+              /// Google Button
+              Obx(() {
+                return GestureDetector(
+                  onTap: () {
+                    if (!controller.isLoading.value) {
+                      controller.loginWithGoogle();
+                    }
+                  },
+                  child: Container(
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(32),
+                      border: Border.all(color: Colors.grey.withOpacity(0.5)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (controller.isLoading.value)
+                          const SmallLoader(color: colorPrimary)
+                        else ...[
+                          SvgPicture.asset("assets/icons/google.svg",
+                              width: 24),
+                          const SizedBox(width: 12),
+                          const Text(
+                            'Continue with Google',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                              fontFamily: "Poppins",
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                );
+              }),
+              const SizedBox(height: 32),
+
+              // /// Social Media
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //   children: [
+              //     SocialMediaButton(
+              //       assetName: "assets/icons/facebook.svg",
+              //       onTap: () {
+              //         // controller.loginWithFacebook();
+              //       },
+              //     ),
+              //     SocialMediaButton(
+              //       assetName: "assets/icons/google.svg",
+              //       onTap: controller.loginWithGoogle,
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 40),
             ],
           ),
         ),

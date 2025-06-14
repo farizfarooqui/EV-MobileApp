@@ -182,6 +182,7 @@ class WelcomeScreenController extends GetxController {
       final userData = {
         'uid': user.uid,
         'email': user.email,
+        'name': user.displayName,
         'createdAt': Timestamp.now(),
         'isVerified': user.emailVerified,
       };

@@ -15,7 +15,7 @@ class MainNavBar extends StatelessWidget {
 
   final List<Widget> _screens = [
     MyBookingScreen(),
-    const ChargersScreen(),
+    ChargersScreen(),
     HomeScreen(),
     const AccountScreen(),
     SettingsScreen()

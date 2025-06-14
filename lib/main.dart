@@ -3,14 +3,12 @@ import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
 import 'package:nobile/Views/WelcomeBackScreen.dart';
 import 'package:nobile/firebase_options.dart';
-import 'package:nobile/supabase_client.dart';
 import 'package:nobile/Controller/theme_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await SupabaseManager.init();
   runApp(const MyApp());
 }
 
@@ -38,7 +36,6 @@ class MyApp extends StatelessWidget {
       ),
       themeMode: themeController.themeMode,
       home: WelcomeBackScreen(),
-      // home: FetchStationsScreen(),
     );
   }
 }
