@@ -33,7 +33,7 @@ class LogoutScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 30),
-              BulletPoint(text: "logout"),
+              const BulletPoint(text: "logout"),
               const Spacer(),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -92,7 +92,7 @@ class LogoutScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       SizedBox(height: Get.height * 0.01),
-                      Text(
+                      const Text(
                         "AreYouSureYouWantToProceed",
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -135,7 +135,7 @@ class LogoutScreen extends StatelessWidget {
 class BulletPoint extends StatelessWidget {
   final String text;
 
-  const BulletPoint({Key? key, required this.text}) : super(key: key);
+  const BulletPoint({super.key, required this.text});
 
   @override
   Widget build(BuildContext context) {

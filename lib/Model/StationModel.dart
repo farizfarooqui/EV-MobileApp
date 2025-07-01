@@ -136,17 +136,24 @@ class ChargingPort {
   });
 
   factory ChargingPort.fromJson(Map<String, dynamic> json) {
-    return ChargingPort(
-      id: json['id'] as String,
-      type: json['type'] as String,
-      status: json['status'] as String,
-      pricing: (json['pricing'] as num).toDouble(),
-      isActive: json['isActive'] as bool,
-      lastUpdated: json['lastUpdated'] as Timestamp,
-      slots: (json['slots'] as List<dynamic>)
+    final slotsRaw = json['slots'];
+    List<Slot> parsedSlots = [];
+
+    if (slotsRaw is List) {
+      parsedSlots = slotsRaw
           .map((slot) => Slot.fromJson(slot as Map<String, dynamic>))
-          .toList(),
-      slotsPerDay: json['slotsPerDay'] as int,
+          .toList();
+    }
+
+    return ChargingPort(
+      id: json['id'] ?? '',
+      type: json['type'] ?? '',
+      status: json['status'] ?? '',
+      pricing: (json['pricing'] ?? 0).toDouble(),
+      isActive: json['isActive'] ?? false,
+      lastUpdated: json['lastUpdated'] ?? Timestamp.now(),
+      slots: parsedSlots,
+      slotsPerDay: json['slotsPerDay'] ?? 0,
     );
   }
 
@@ -236,9 +243,22 @@ class ChargingStation {
       imageUrl: json['imageUrl'] ?? '',
       location: json['location'] ?? const GeoPoint(0, 0),
       numberOfPorts: json['numberOfPorts'] ?? 0,
-      ports: (json['ports'] as List<dynamic>)
-          .map((portJson) => ChargingPort.fromJson(portJson))
-          .toList(),
+      ports: (() {
+        final raw = json['ports'];
+        if (raw is List) {
+          return raw
+              .map((portJson) => ChargingPort.fromJson(portJson))
+              .toList()
+              .cast<ChargingPort>();
+        } else if (raw is Map) {
+          return raw.values
+              .map((portJson) => ChargingPort.fromJson(portJson))
+              .toList()
+              .cast<ChargingPort>();
+        } else {
+          return <ChargingPort>[];
+        }
+      })(),
       amenities: List<String>.from(json['amenities'] ?? []),
     );
   }

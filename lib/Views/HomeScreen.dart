@@ -23,6 +23,7 @@ class HomeScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: FloatingActionButton(
+              heroTag: null,
               onPressed: () {
                 controller.getCurrentLocation();
               },
@@ -36,6 +37,7 @@ class HomeScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 90),
             child: FloatingActionButton(
+              heroTag: null,
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
@@ -569,8 +571,10 @@ class StationDetailSheet extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             LinearProgressIndicator(
-              value: port.slots.where((slot) => slot.isBooked).length /
-                  port.slots.length,
+              value: port.slots.isEmpty
+                  ? 0.0
+                  : port.slots.where((slot) => slot.isBooked).length /
+                      port.slots.length,
               backgroundColor: Colors.grey[200],
               valueColor: AlwaysStoppedAnimation<Color>(
                 port.isActive ? Colors.green : Colors.red,

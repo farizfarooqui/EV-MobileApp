@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:nobile/Controller/BookingController.dart';
 import 'package:nobile/Controller/StationDetailController.dart';
 import 'package:nobile/Model/StationModel.dart';
 import 'package:nobile/Views/Widgets/SmallLoader.dart';
@@ -12,7 +13,8 @@ class StationDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(StationDetailsController(stationId));
+    final stationController = Get.put(StationDetailsController(stationId));
+    final bookingController = Get.put(BookingController());
 
     // Date pickers per port
     final Map<String, Rx<DateTime>> selectedDates = {};
@@ -33,10 +35,63 @@ class StationDetailsScreen extends StatelessWidget {
 
     String formatTime(DateTime time) => DateFormat('h:mm a').format(time);
 
+    Future<void> handleBooking(Slot slot, ChargingPort port) async {
+      final result = await Get.dialog<bool>(
+        AlertDialog(
+          title: const Text('Confirm Booking'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Start Time: ${formatTime(slot.startTime)}'),
+              Text('End Time: ${formatTime(slot.endTime)}'),
+              Text('Port Type: ${port.type}'),
+              Text('Price: \$${port.pricing}/hr'),
+              Text(
+                  'Total Price: \$${(port.pricing * (slot.endTime.difference(slot.startTime).inHours)).toStringAsFixed(2)}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(result: false),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Get.back(result: true),
+              child: const Text('Book Now'),
+            ),
+          ],
+        ),
+      );
+
+      if (result == true) {
+        final success = await bookingController.createBooking(
+          stationId: stationId,
+          portId: port.id,
+          slotId: slot.id,
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+          totalPrice:
+              port.pricing * (slot.endTime.difference(slot.startTime).inHours),
+        );
+
+        if (success) {
+          Get.back(); // Return to previous screen
+          Get.snackbar(
+            'Success',
+            'Booking created successfully',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+        }
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text("Station Details")),
       body: Obx(() {
-        final station = controller.station.value;
+        final station = stationController.station.value;
 
         if (station == null) {
           return const Center(child: SmallLoader());
@@ -166,6 +221,12 @@ class StationDetailsScreen extends StatelessWidget {
                                 '${formatTime(slot.startTime)} - ${formatTime(slot.endTime)}'),
                             subtitle:
                                 Text(slot.isBooked ? 'Booked' : 'Available'),
+                            trailing: !slot.isBooked
+                                ? ElevatedButton(
+                                    onPressed: () => handleBooking(slot, port),
+                                    child: const Text('Book'),
+                                  )
+                                : null,
                           )),
                     ],
                   );
