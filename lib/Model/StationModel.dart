@@ -27,7 +27,7 @@ class Slot {
       startTime: startTime,
       endTime: endTime,
       isBooked: json['isBooked'] as bool? ?? false,
-      bookingId: json['bookingId'] as String?,
+      bookingId: json['bookingId']?.toString(),
     );
   }
 

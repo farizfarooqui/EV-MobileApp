@@ -9,62 +9,62 @@ class LogoutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: colorPrimary,
       appBar: AppBar(
-        title: const Text("Logout screen"),
+        title: const Text("Logout"),
+        centerTitle: true,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
       ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.8,
-        child: Padding(
-          padding: const EdgeInsets.all(30.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text(
-                "Lou Account",
-                textAlign: TextAlign.center,
-                // textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: colorSecondary,
-                  fontWeight: FontWeight.w500,
-                ),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            const Spacer(),
+            Icon(
+              Icons.logout_rounded,
+              size: 80,
+              color: theme.colorScheme.primary.withOpacity(0.8),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              "Are you sure you want to log out?",
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 30),
-              const BulletPoint(text: "logout"),
-              const Spacer(),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child:
-                    // LoaderButton2(
-                    //   buttonName: "delete".translate,
-                    //   onPressed: () {
-                    //     showConfirmationDialog();
-                    //   },
-                    // ),
-                    GestureDetector(
-                  onTap: () {
-                    showConfirmationDialog();
-                  },
-                  child: Container(
-                    height: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: colorSecondary,
-                    ),
-                    child: const Center(
-                      child: Text(
-                        "logout",
-                        style: TextStyle(fontSize: 16, color: colorPrimary),
-                      ),
-                    ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              "You will be signed out of your account.",
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.hintColor,
+              ),
+            ),
+            const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => showConfirmationDialog(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorPrimary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                child: const Text(
+                  "Log Out",
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 24),
+          ],
         ),
       ),
     );
@@ -72,80 +72,62 @@ class LogoutScreen extends StatelessWidget {
 
   Future<void> showConfirmationDialog() async {
     final LogoutController controller = Get.put(LogoutController());
+
     Get.dialog(
-      Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(20),
+      Center(
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 32),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Are you sure?",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Material(
-                  color: Colors.transparent,
-                  child: Column(
-                    children: [
-                      SizedBox(height: Get.height * 0.01),
-                      const Text(
-                        "AreYouSureYouWantToProceed",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 20),
+                const SizedBox(height: 12),
+                const Text(
+                  "This will log you out of your account. You can sign back in anytime.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomElevatedButton(
+                        text: "Cancel",
+                        backgroundColor: Colors.grey[300]!,
+                        textColor: Colors.black,
+                        onpress: () => Get.back(),
                       ),
-                      SizedBox(height: Get.height * 0.02),
-                      CustomElevatedButton(
-                          fontWeight: FontWeight.bold,
-                          borderColor: const Color(0xff2e124c33),
-                          text: 'Cancel',
-                          backgroundColor: colorNavBar,
-                          onpress: () {
-                            Get.back();
-                          }),
-                      SizedBox(height: Get.height * 0.02),
-                      Obx(
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Obx(
                         () => CustomElevatedButton(
-                            loading: controller.deleteBtnLoading.value,
-                            fontWeight: FontWeight.bold,
-                            // elevation: 2,
-                            text: 'Ok',
-                            textColor: colorPrimary,
-                            backgroundColor: Colors.black,
-                            onpress: () {
-                              controller.logout();
-                            }),
-                      )
-                    ],
-                  ),
-                ),
-              ),
+                          text: "Yes, Logout",
+                          loading: controller.deleteBtnLoading.value,
+                          backgroundColor: Colors.red,
+                          textColor: Colors.white,
+                          onpress: () => controller.logout(),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
             ),
           ),
-        ],
+        ),
       ),
-    );
-  }
-}
-
-class BulletPoint extends StatelessWidget {
-  final String text;
-
-  const BulletPoint({super.key, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 14, color: Colors.grey),
-        textAlign: TextAlign.center,
-      ),
+      barrierDismissible: false,
     );
   }
 }

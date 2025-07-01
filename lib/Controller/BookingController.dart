@@ -1,18 +1,18 @@
 // booking_controller.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nobile/Constants/Utils.dart';
 import 'package:nobile/Model/StationModel.dart';
+import 'package:nobile/Service/UserPreferences.dart';
 
 class BookingController extends GetxController
     with GetTickerProviderStateMixin {
   late TabController tabController;
-  final RxList<Booking> activeBookings = <Booking>[].obs;
-  final RxList<Booking> completedBookings = <Booking>[].obs;
-  final RxList<Booking> canceledBookings = <Booking>[].obs;
-  final RxBool isLoading = false.obs;
+
+  List<Booking> allBookings = [];
+  List<Booking> activeBookings = [];
+  List<Booking> completedBookings = [];
+  List<Booking> canceledBookings = [];
 
   @override
   void onInit() {
@@ -21,182 +21,52 @@ class BookingController extends GetxController
     fetchUserBookings();
   }
 
-  @override
-  void onClose() {
-    tabController.dispose();
-    super.onClose();
-  }
-
   Future<void> fetchUserBookings() async {
-    try {
-      isLoading.value = true;
-      final userId = FirebaseAuth.instance.currentUser?.uid;
-      if (userId == null) return;
+    final now = DateTime.now();
 
-      final bookingsSnapshot = await FirebaseFirestore.instance
-          .collection('bookings')
-          .where('userId', isEqualTo: userId)
-          .get();
+    final user = await UserPreferences.getUser();
+    if (user == null || user['uid'] == null) return;
 
-      final allBookings = bookingsSnapshot.docs
-          .map((doc) => Booking.fromJson({...doc.data(), 'id': doc.id}))
-          .toList();
+    final query = await FirebaseFirestore.instance
+        .collection('bookings')
+        .where('userId', isEqualTo: user['uid'])
+        .orderBy('startTime', descending: true)
+        .get();
 
-      // Sort bookings into respective lists
-      activeBookings.value = allBookings
-          .where((booking) =>
-              booking.status == 'approved' &&
-              booking.endTime.isAfter(DateTime.now()))
-          .toList();
+    allBookings = query.docs.map((doc) {
+      final data = doc.data();
+      return Booking.fromJson(data);
+    }).toList();
 
-      completedBookings.value = allBookings
-          .where((booking) =>
-              booking.status == 'completed' ||
-              (booking.status == 'approved' &&
-                  booking.endTime.isBefore(DateTime.now())))
-          .toList();
+    activeBookings = allBookings
+        .where((b) =>
+            b.status.toLowerCase() == 'active' && b.endTime.compareTo(now) > 0)
+        .toList();
 
-      canceledBookings.value = allBookings
-          .where((booking) => booking.status == 'canceled')
-          .toList();
-    } catch (e) {
-      Utils.showError('Error', 'Failed to fetch bookings: $e');
-    } finally {
-      isLoading.value = false;
-    }
-  }
+    completedBookings = allBookings
+        .where((b) =>
+            b.status.toLowerCase() == 'active' && b.endTime.compareTo(now) <= 0)
+        .toList();
 
-  Future<bool> createBooking({
-    required String stationId,
-    required String portId,
-    required String slotId,
-    required DateTime startTime,
-    required DateTime endTime,
-    required double totalPrice,
-  }) async {
-    try {
-      isLoading.value = true;
-      final userId = FirebaseAuth.instance.currentUser?.uid;
-      if (userId == null) {
-        throw Exception('User not authenticated');
-      }
+    canceledBookings =
+        allBookings.where((b) => b.status.toLowerCase() == 'canceled').toList();
 
-      // Create booking document
-      final bookingRef = FirebaseFirestore.instance.collection('bookings').doc();
-      final booking = Booking(
-        id: bookingRef.id,
-        stationId: stationId,
-        portId: portId,
-        userId: userId,
-        startTime: startTime,
-        endTime: endTime,
-        status: 'pending',
-        createdAt: Timestamp.now(),
-        totalPrice: totalPrice,
-      );
-
-      // Update slot status
-      final stationRef = FirebaseFirestore.instance
-          .collection('chargingStations')
-          .doc(stationId);
-      
-      final stationDoc = await stationRef.get();
-      if (!stationDoc.exists) {
-        throw Exception('Station not found');
-      }
-
-      final station = ChargingStation.fromJson({
-        ...stationDoc.data()!,
-        'id': stationDoc.id,
-      });
-
-      final portIndex = station.ports.indexWhere((p) => p.id == portId);
-      if (portIndex == -1) {
-        throw Exception('Port not found');
-      }
-
-      final slotIndex = station.ports[portIndex].slots.indexWhere((s) => s.id == slotId);
-      if (slotIndex == -1) {
-        throw Exception('Slot not found');
-      }
-
-      // Update slot in Firestore
-      await stationRef.update({
-        'ports.$portIndex.slots.$slotIndex.isBooked': true,
-        'ports.$portIndex.slots.$slotIndex.bookingId': bookingRef.id,
-      });
-
-      // Save booking
-      await bookingRef.set(booking.toJson());
-
-      // Refresh bookings
-      await fetchUserBookings();
-      return true;
-    } catch (e) {
-      Utils.showError('Error', 'Failed to create booking: $e');
-      return false;
-    } finally {
-      isLoading.value = false;
-    }
+    update(); // Notify UI
   }
 
   Future<bool> cancelBooking(String bookingId) async {
     try {
-      isLoading.value = true;
-      final bookingRef = FirebaseFirestore.instance.collection('bookings').doc(bookingId);
-      final bookingDoc = await bookingRef.get();
-      
-      if (!bookingDoc.exists) {
-        throw Exception('Booking not found');
-      }
-
-      final booking = Booking.fromJson({...bookingDoc.data()!, 'id': bookingDoc.id});
-      
-      // Update booking status
-      await bookingRef.update({
-        'status': 'canceled',
-        'updatedAt': Timestamp.now(),
+      await FirebaseFirestore.instance
+          .collection('bookings')
+          .doc(bookingId)
+          .update({
+        'status': 'Canceled',
       });
-
-      // Update slot status
-      final stationRef = FirebaseFirestore.instance
-          .collection('chargingStations')
-          .doc(booking.stationId);
-      
-      final stationDoc = await stationRef.get();
-      if (!stationDoc.exists) {
-        throw Exception('Station not found');
-      }
-
-      final station = ChargingStation.fromJson({
-        ...stationDoc.data()!,
-        'id': stationDoc.id,
-      });
-
-      final portIndex = station.ports.indexWhere((p) => p.id == booking.portId);
-      if (portIndex == -1) {
-        throw Exception('Port not found');
-      }
-
-      final slotIndex = station.ports[portIndex].slots.indexWhere((s) => s.bookingId == bookingId);
-      if (slotIndex == -1) {
-        throw Exception('Slot not found');
-      }
-
-      // Update slot in Firestore
-      await stationRef.update({
-        'ports.$portIndex.slots.$slotIndex.isBooked': false,
-        'ports.$portIndex.slots.$slotIndex.bookingId': null,
-      });
-
-      // Refresh bookings
-      await fetchUserBookings();
+      fetchUserBookings(); // Refresh list
       return true;
     } catch (e) {
-      Utils.showError('Error', 'Failed to cancel booking: $e');
+      print("Cancel booking error: $e");
       return false;
-    } finally {
-      isLoading.value = false;
     }
   }
 }

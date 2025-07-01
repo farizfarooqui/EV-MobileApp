@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:nobile/Controller/BookingController.dart';
 import 'package:nobile/Controller/StationDetailController.dart';
 import 'package:nobile/Model/StationModel.dart';
 import 'package:nobile/Views/Widgets/SmallLoader.dart';
@@ -14,14 +13,12 @@ class StationDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stationController = Get.put(StationDetailsController(stationId));
-    final bookingController = Get.put(BookingController());
-
     // Date pickers per port
     final Map<String, Rx<DateTime>> selectedDates = {};
 
     List<DateTime> getNext7Days() {
       return List.generate(
-          7, (index) => DateTime.now().add(Duration(days: index)));
+          6, (index) => DateTime.now().add(Duration(days: index + 1)));
     }
 
     List<Slot> getSlotsForDay(List<Slot> slots, DateTime day) {
@@ -34,60 +31,6 @@ class StationDetailsScreen extends StatelessWidget {
     }
 
     String formatTime(DateTime time) => DateFormat('h:mm a').format(time);
-
-    Future<void> handleBooking(Slot slot, ChargingPort port) async {
-      final result = await Get.dialog<bool>(
-        AlertDialog(
-          title: const Text('Confirm Booking'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Start Time: ${formatTime(slot.startTime)}'),
-              Text('End Time: ${formatTime(slot.endTime)}'),
-              Text('Port Type: ${port.type}'),
-              Text('Price: \$${port.pricing}/hr'),
-              Text(
-                  'Total Price: \$${(port.pricing * (slot.endTime.difference(slot.startTime).inHours)).toStringAsFixed(2)}'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Get.back(result: false),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () => Get.back(result: true),
-              child: const Text('Book Now'),
-            ),
-          ],
-        ),
-      );
-
-      if (result == true) {
-        final success = await bookingController.createBooking(
-          stationId: stationId,
-          portId: port.id,
-          slotId: slot.id,
-          startTime: slot.startTime,
-          endTime: slot.endTime,
-          totalPrice:
-              port.pricing * (slot.endTime.difference(slot.startTime).inHours),
-        );
-
-        if (success) {
-          Get.back(); // Return to previous screen
-          Get.snackbar(
-            'Success',
-            'Booking created successfully',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-          );
-        }
-      }
-    }
-
     return Scaffold(
       appBar: AppBar(title: const Text("Station Details")),
       body: Obx(() {
@@ -118,7 +61,9 @@ class StationDetailsScreen extends StatelessWidget {
                 children: [
                   Text(station.stationName,
                       style: const TextStyle(
-                          fontSize: 22, fontWeight: FontWeight.bold)),
+                          overflow: TextOverflow.ellipsis,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold)),
                   Icon(
                     station.verified ? Icons.verified : Icons.verified_outlined,
                     color: station.verified ? Colors.green : Colors.grey,
@@ -209,25 +154,61 @@ class StationDetailsScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      if (todaySlots.isEmpty)
-                        const Text("No slots available for this day."),
-                      ...todaySlots.map((slot) => ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: Icon(
-                                slot.isBooked ? Icons.lock : Icons.lock_open,
-                                color:
-                                    slot.isBooked ? Colors.red : Colors.green),
-                            title: Text(
-                                '${formatTime(slot.startTime)} - ${formatTime(slot.endTime)}'),
-                            subtitle:
-                                Text(slot.isBooked ? 'Booked' : 'Available'),
-                            trailing: !slot.isBooked
-                                ? ElevatedButton(
-                                    onPressed: () => handleBooking(slot, port),
-                                    child: const Text('Book'),
-                                  )
-                                : null,
-                          )),
+                      // if (todaySlots.isEmpty)
+                      // const Text("No slots available for this day."),
+                      ...todaySlots.map((slot) => Obx(() {
+                            final selectedSlotId =
+                                stationController.selectedSlotPerPort[port.id];
+                            final isSelected = selectedSlotId == slot.id;
+                            return ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: Radio<String>(
+                                value: slot.id,
+                                groupValue: selectedSlotId,
+                                onChanged: slot.isBooked
+                                    ? null
+                                    : (val) {
+                                        stationController.selectSlot(
+                                            port.id, slot.id);
+                                      },
+                              ),
+                              title: Text(
+                                  '${formatTime(slot.startTime)} - ${formatTime(slot.endTime)}'),
+                              subtitle: RichText(
+                                text: TextSpan(
+                                  text: 'Status: ',
+                                  style: const TextStyle(
+                                      color: Colors.black87, fontSize: 14),
+                                  children: [
+                                    TextSpan(
+                                      text: slot.isBooked
+                                          ? 'Booked'
+                                          : 'Available',
+                                      style: TextStyle(
+                                        color: slot.isBooked
+                                            ? Colors.red
+                                            : Colors.green,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              trailing: isSelected && !slot.isBooked
+                                  ? ElevatedButton(
+                                      onPressed: () async {
+                                        stationController.bookSlot(
+                                            portId: port.id,
+                                            slotId: slot.id,
+                                            startTime: slot.startTime,
+                                            endTime: slot.startTime,
+                                            totalPrice: port.pricing);
+                                      },
+                                      child: const Text('Book'),
+                                    )
+                                  : null,
+                            );
+                          })),
                     ],
                   );
                 });

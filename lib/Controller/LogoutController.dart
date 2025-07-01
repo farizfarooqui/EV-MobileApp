@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:nobile/Constants/Utils.dart';
 import 'package:nobile/Controller/StationController.dart';
+import 'package:nobile/Service/UserPreferences.dart';
 import 'package:nobile/Views/MainNavBar.dart';
 import 'package:nobile/Views/WelcomeBackScreen.dart';
 
@@ -24,6 +25,8 @@ class LogoutController extends GetxController {
 
       await _auth.signOut();
       await _googleSignIn.signOut();
+      await FirebaseAuth.instance.signOut();
+      await UserPreferences.clearUser();
 
       // Delete controllers before navigation
       logoutBtnLoading.value = false;

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:nobile/Constants/Utils.dart';
+import 'package:nobile/Service/UserPreferences.dart';
 import 'package:nobile/Views/CreateAccountScreen.dart';
 import 'package:nobile/Views/HomeScreen.dart';
 import 'package:nobile/Views/MainNavBar.dart';
@@ -192,6 +193,8 @@ class WelcomeScreenController extends GetxController {
           .collection('users')
           .doc(user.uid)
           .set(userData);
+
+      await UserPreferences.saveUser(userData);
 
       // Navigate to home screen
       Get.offAll(() => MainNavBar(),

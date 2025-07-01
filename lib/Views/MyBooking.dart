@@ -31,7 +31,8 @@ class MyBookingScreen extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: booking.status == 'approved'
                         ? Colors.green
@@ -109,8 +110,8 @@ class MyBookingScreen extends StatelessWidget {
 
   Widget _buildBookingList(List<Booking> bookings, bool isActive) {
     if (bookings.isEmpty) {
-      return _buildEmptyState(
-          Get.context!, 'No ${isActive ? 'active' : 'completed'} bookings found.');
+      return _buildEmptyState(Get.context!,
+          'No ${isActive ? 'active' : 'completed'} bookings found.');
     }
 
     return ListView.builder(

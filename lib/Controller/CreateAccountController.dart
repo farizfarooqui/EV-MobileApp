@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Utils.dart';
+import 'package:nobile/Service/UserPreferences.dart';
 import 'package:nobile/Views/HomeScreen.dart';
 import 'package:nobile/Views/MainNavBar.dart';
 import 'package:nobile/Views/WelcomeBackScreen.dart';
@@ -100,6 +101,8 @@ class CreateAccountController extends GetxController {
           .collection('users')
           .doc(user.uid)
           .set(userData);
+
+      await UserPreferences.saveUser(userData);
 
       // Navigate to home screen
       Get.offAll(() => MainNavBar(),
