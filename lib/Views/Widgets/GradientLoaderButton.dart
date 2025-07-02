@@ -5,12 +5,14 @@ class GradientLoaderButton extends StatelessWidget {
   final bool isLoading;
   final VoidCallback? onPressed;
   final String text;
+  final double fontsize;
 
   const GradientLoaderButton({
     super.key,
     required this.isLoading,
     required this.onPressed,
     required this.text,
+    required this.fontsize,
   });
 
   @override
@@ -42,10 +44,10 @@ class GradientLoaderButton extends StatelessWidget {
                   )
                 : Text(
                     text,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                      fontSize: fontsize,
                     ),
                   ),
           ),

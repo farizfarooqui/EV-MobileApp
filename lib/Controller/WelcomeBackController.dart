@@ -11,6 +11,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:nobile/Constants/Utils.dart';
 import 'package:nobile/Service/UserPreferences.dart';
 import 'package:nobile/Views/CreateAccountScreen.dart';
+import 'package:nobile/Views/ForgotPasswordScreen.dart';
 import 'package:nobile/Views/HomeScreen.dart';
 import 'package:nobile/Views/MainNavBar.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -37,7 +38,8 @@ class WelcomeScreenController extends GetxController {
   }
 
   void goToForgetScreen() {
-    // Get.to(() => ForgotPasswordScreen(), transition: Transition.rightToLeft);
+    Get.to(() => const ForgotPasswordScreen(),
+        transition: Transition.rightToLeftWithFade);
   }
 
   void toggleRememberMe() {

@@ -140,7 +140,9 @@ class WelcomeBackScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButton(
-                            onPressed: () {/* Forgot password */},
+                            onPressed: () {
+                              controller.goToForgetScreen();
+                            },
                             child: const Text(
                               "Forgot Password?",
                               style: TextStyle(
@@ -157,6 +159,7 @@ class WelcomeBackScreen extends StatelessWidget {
                             isLoading: controller.isLoading.value,
                             onPressed: controller.signInWithEmailAndPassword,
                             text: "Login",
+                            fontsize: 18,
                           )),
 
                       const SizedBox(height: 24),
