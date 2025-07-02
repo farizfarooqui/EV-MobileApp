@@ -49,6 +49,8 @@ class StationDetailsController extends GetxController {
     required DateTime startTime,
     required DateTime endTime,
     required double totalPrice,
+    required String stationName,
+    required String address,
   }) async {
     final docRef = FirebaseFirestore.instance
         .collection('chargingStations')
@@ -105,6 +107,8 @@ class StationDetailsController extends GetxController {
       'status': 'Active',
       'createdAt': Timestamp.now(),
       'totalPrice': totalPrice,
+      'stationName': stationName,
+      'address': address,
     });
 
     log('✅ Slot booked and booking recorded with ID: $bookingId');

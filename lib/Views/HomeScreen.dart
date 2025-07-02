@@ -496,18 +496,22 @@ class StationDetailSheet extends StatelessWidget {
               onPressed: () async {
                 final lat = station.location.latitude;
                 final lng = station.location.longitude;
-                final googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+                final googleMapsUrl =
+                    'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
                 if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
-                  await launchUrl(Uri.parse(googleMapsUrl), mode: LaunchMode.externalApplication);
+                  await launchUrl(Uri.parse(googleMapsUrl),
+                      mode: LaunchMode.externalApplication);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Could not open Google Maps.')),
+                    const SnackBar(
+                        content: Text('Could not open Google Maps.')),
                   );
                 }
               },
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: colorPrimary, width: 1),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                side: const BorderSide(color: colorPrimary, width: 1),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 minimumSize: const Size(double.infinity, 50),
                 foregroundColor: colorPrimary,
               ),
@@ -516,6 +520,7 @@ class StationDetailSheet extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
+
             const SizedBox(height: 12),
             OutlinedButton(
               onPressed: () {
@@ -524,7 +529,8 @@ class StationDetailSheet extends StatelessWidget {
               },
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: colorPrimary, width: 1),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
                 minimumSize: const Size(double.infinity, 50),
                 foregroundColor: colorPrimary,
               ),

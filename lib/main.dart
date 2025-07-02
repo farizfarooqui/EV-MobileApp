@@ -5,6 +5,7 @@ import 'package:nobile/Views/WelcomeBackScreen.dart';
 import 'package:nobile/firebase_options.dart';
 import 'package:nobile/Controller/theme_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:nobile/Constants/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,20 +21,8 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'EV Mobile App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: colorPrimary,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: colorPrimary,
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
       themeMode: themeController.themeMode,
       home: WelcomeBackScreen(),
     );

@@ -13,6 +13,9 @@ class StationDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final stationController = Get.put(StationDetailsController(stationId));
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     // Date pickers per port
     final Map<String, Rx<DateTime>> selectedDates = {};
 
@@ -32,187 +35,401 @@ class StationDetailsScreen extends StatelessWidget {
 
     String formatTime(DateTime time) => DateFormat('h:mm a').format(time);
     return Scaffold(
-      appBar: AppBar(title: const Text("Station Details")),
+      backgroundColor: colorScheme.background,
+      appBar: AppBar(
+        title: const Text("Station Details"),
+        // backgroundColor: colorScheme.background,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: Obx(() {
         final station = stationController.station.value;
-
         if (station == null) {
           return const Center(child: SmallLoader());
         }
-
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              if (station.imageUrl.isNotEmpty)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    station.imageUrl,
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+              // Glowing accent
+              Container(
+                margin: const EdgeInsets.only(top: 32, bottom: 16),
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: colorScheme.primary.withOpacity(0.7),
+                      blurRadius: 60,
+                      spreadRadius: 10,
+                    ),
+                  ],
+                  color: colorScheme.primary,
                 ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(station.stationName,
-                      style: const TextStyle(
-                          overflow: TextOverflow.ellipsis,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold)),
-                  Icon(
-                    station.verified ? Icons.verified : Icons.verified_outlined,
-                    color: station.verified ? Colors.green : Colors.grey,
-                  ),
-                ],
+                child:
+                    const Icon(Icons.ev_station, color: Colors.white, size: 36),
               ),
-              const SizedBox(height: 6),
-              Text('${station.city}, ${station.state}, ${station.country}'),
-              Text('${station.address}, Zip: ${station.zipCode}'),
-              const SizedBox(height: 12),
-              if (station.description.isNotEmpty) ...[
-                const Text('Description',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                Text(station.description),
-                const SizedBox(height: 16),
-              ],
-              if (station.amenities.isNotEmpty) ...[
-                const Text('Amenities',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                Wrap(
-                  spacing: 8,
-                  children: station.amenities
-                      .map((a) => Chip(label: Text(a)))
-                      .toList(),
+              if (station.imageUrl.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.network(
+                      station.imageUrl,
+                      height: 180,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 16),
-              ],
-              const Text('Charging Ports',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 12),
-              ...station.ports.map((port) {
-                // Initialize selected date if not present
-                selectedDates.putIfAbsent(
-                    port.id, () => Rx<DateTime>(DateTime.now()));
-
-                final dateRx = selectedDates[port.id]!;
-
-                return Obx(() {
-                  final selectedDay = dateRx.value;
-                  final dayList = getNext7Days();
-                  final todaySlots = getSlotsForDay(port.slots, selectedDay);
-
-                  return ExpansionTile(
-                    tilePadding: const EdgeInsets.symmetric(horizontal: 12),
-                    childrenPadding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    backgroundColor: Colors.grey.shade100,
-                    collapsedBackgroundColor: Colors.grey.shade200,
-                    title: Row(
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(port.type,
-                            style:
-                                const TextStyle(fontWeight: FontWeight.bold)),
-                        const SizedBox(width: 10),
-                        Text('\$${port.pricing}/hr',
-                            style: const TextStyle(color: Colors.green)),
-                        const Spacer(),
-                        Icon(port.isActive ? Icons.power : Icons.power_off,
-                            color: port.isActive ? Colors.green : Colors.red),
+                        Expanded(
+                          child: Text(
+                            station.stationName,
+                            style: textTheme.titleLarge?.copyWith(
+                              color: colorScheme.onBackground,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Icon(
+                          station.verified
+                              ? Icons.verified
+                              : Icons.verified_outlined,
+                          color: station.verified
+                              ? colorScheme.primary
+                              : colorScheme.outline,
+                        ),
                       ],
                     ),
-                    children: [
-                      SizedBox(
-                        height: 60,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: dayList.length,
-                          itemBuilder: (context, index) {
-                            final date = dayList[index];
-                            final isSelected = date.day == selectedDay.day &&
-                                date.month == selectedDay.month &&
-                                date.year == selectedDay.year;
-
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 4),
-                              child: ChoiceChip(
-                                label: Text(
-                                    DateFormat('EEE\ndd MMM').format(date),
-                                    textAlign: TextAlign.center),
-                                selected: isSelected,
-                                onSelected: (_) => dateRx.value = date,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // if (todaySlots.isEmpty)
-                      // const Text("No slots available for this day."),
-                      ...todaySlots.map((slot) => Obx(() {
-                            final selectedSlotId =
-                                stationController.selectedSlotPerPort[port.id];
-                            final isSelected = selectedSlotId == slot.id;
-                            return ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: Radio<String>(
-                                value: slot.id,
-                                groupValue: selectedSlotId,
-                                onChanged: slot.isBooked
-                                    ? null
-                                    : (val) {
-                                        stationController.selectSlot(
-                                            port.id, slot.id);
-                                      },
-                              ),
-                              title: Text(
-                                  '${formatTime(slot.startTime)} - ${formatTime(slot.endTime)}'),
-                              subtitle: RichText(
-                                text: TextSpan(
-                                  text: 'Status: ',
-                                  style: const TextStyle(
-                                      color: Colors.black87, fontSize: 14),
-                                  children: [
-                                    TextSpan(
-                                      text: slot.isBooked
-                                          ? 'Booked'
-                                          : 'Available',
-                                      style: TextStyle(
-                                        color: slot.isBooked
-                                            ? Colors.red
-                                            : Colors.green,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              trailing: isSelected && !slot.isBooked
-                                  ? ElevatedButton(
-                                      onPressed: () async {
-                                        stationController.bookSlot(
-                                            portId: port.id,
-                                            slotId: slot.id,
-                                            startTime: slot.startTime,
-                                            endTime: slot.startTime,
-                                            totalPrice: port.pricing);
-                                      },
-                                      child: const Text('Book'),
-                                    )
-                                  : null,
-                            );
-                          })),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${station.city}, ${station.state}, ${station.country}',
+                      style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onBackground.withOpacity(0.7)),
+                    ),
+                    Text(
+                      '${station.address}, Zip: ${station.zipCode}',
+                      style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onBackground.withOpacity(0.7)),
+                    ),
+                    const SizedBox(height: 16),
+                    if (station.description.isNotEmpty) ...[
+                      Text('Description',
+                          style: textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold)),
+                      Text(station.description, style: textTheme.bodyMedium),
+                      const SizedBox(height: 16),
                     ],
-                  );
-                });
-              }),
+                    if (station.amenities.isNotEmpty) ...[
+                      Text('Amenities',
+                          style: textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold)),
+                      Wrap(
+                        spacing: 8,
+                        children: station.amenities
+                            .map((a) => Chip(
+                                  label: Text(a,
+                                      style: textTheme.bodySmall?.copyWith(
+                                          color: colorScheme.primary)),
+                                  backgroundColor:
+                                      colorScheme.primary.withOpacity(0.08),
+                                ))
+                            .toList(),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    Text('Charging Ports',
+                        style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold, fontSize: 18)),
+                    const SizedBox(height: 12),
+                    ...station.ports.map((port) {
+                      selectedDates.putIfAbsent(
+                          port.id, () => Rx<DateTime>(DateTime.now()));
+                      final dateRx = selectedDates[port.id]!;
+                      return Obx(() {
+                        final selectedDay = dateRx.value;
+                        final dayList = getNext7Days();
+                        final todaySlots =
+                            getSlotsForDay(port.slots, selectedDay);
+                        return Card(
+                          color: colorScheme.surface,
+                          elevation: 2,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 8),
+                            child: ExpansionTile(
+                              tilePadding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              childrenPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12)),
+                              backgroundColor: colorScheme.surface,
+                              collapsedBackgroundColor: colorScheme.surface,
+                              title: Row(
+                                children: [
+                                  Text(port.type,
+                                      style: textTheme.bodyLarge?.copyWith(
+                                          fontWeight: FontWeight.bold)),
+                                  const SizedBox(width: 10),
+                                  Text('	${port.pricing}/hr',
+                                      style: textTheme.bodyMedium?.copyWith(
+                                          color: colorScheme.primary)),
+                                  const Spacer(),
+                                  Icon(
+                                      port.isActive
+                                          ? Icons.power
+                                          : Icons.power_off,
+                                      color: port.isActive
+                                          ? colorScheme.primary
+                                          : colorScheme.error),
+                                ],
+                              ),
+                              children: [
+                                SizedBox(
+                                  height: 60,
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: dayList.length,
+                                    itemBuilder: (context, index) {
+                                      final date = dayList[index];
+                                      final isSelected =
+                                          date.day == selectedDay.day &&
+                                              date.month == selectedDay.month &&
+                                              date.year == selectedDay.year;
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 4),
+                                        child: ChoiceChip(
+                                          label: Text(
+                                              DateFormat('EEE\ndd MMM')
+                                                  .format(date),
+                                              textAlign: TextAlign.center),
+                                          selected: isSelected,
+                                          selectedColor: colorScheme.primary
+                                              .withOpacity(0.2),
+                                          onSelected: (_) =>
+                                              dateRx.value = date,
+                                          backgroundColor:
+                                              colorScheme.surfaceVariant,
+                                          labelStyle: textTheme.bodySmall
+                                              ?.copyWith(
+                                                  color: isSelected
+                                                      ? colorScheme.primary
+                                                      : colorScheme.onSurface),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                ...todaySlots.map((slot) => Obx(() {
+                                      final selectedSlotId = stationController
+                                          .selectedSlotPerPort[port.id];
+                                      final isSelected =
+                                          selectedSlotId == slot.id;
+                                      return Card(
+                                        color: colorScheme.background,
+                                        elevation: 1,
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 4),
+                                        child: ListTile(
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 8, vertical: 0),
+                                          leading: Radio<String>(
+                                            value: slot.id,
+                                            groupValue: selectedSlotId,
+                                            onChanged: slot.isBooked
+                                                ? null
+                                                : (val) {
+                                                    stationController
+                                                        .selectSlot(
+                                                            port.id, slot.id);
+                                                  },
+                                            activeColor: colorScheme.primary,
+                                          ),
+                                          title: Text(
+                                              '${formatTime(slot.startTime)} - ${formatTime(slot.endTime)}',
+                                              style: textTheme.bodyMedium),
+                                          subtitle: RichText(
+                                            text: TextSpan(
+                                              text: 'Status: ',
+                                              style: textTheme.bodySmall
+                                                  ?.copyWith(
+                                                      color: colorScheme
+                                                          .onBackground
+                                                          .withOpacity(0.7)),
+                                              children: [
+                                                TextSpan(
+                                                  text: slot.isBooked
+                                                      ? 'Booked'
+                                                      : 'Available',
+                                                  style: TextStyle(
+                                                    color: slot.isBooked
+                                                        ? colorScheme.error
+                                                        : colorScheme.primary,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          trailing: isSelected && !slot.isBooked
+                                              ? OutlinedButton(
+                                                  onPressed: () async {
+                                                    final confirmed =
+                                                        await Get.dialog<bool>(
+                                                      AlertDialog(
+                                                        backgroundColor:
+                                                            colorScheme.surface,
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20)),
+                                                        title: Row(
+                                                          children: [
+                                                            Icon(
+                                                                Icons
+                                                                    .check_circle,
+                                                                color:
+                                                                    colorScheme
+                                                                        .primary,
+                                                                size: 32),
+                                                            const SizedBox(
+                                                                width: 8),
+                                                            const Text(
+                                                              'Confirm Booking',
+                                                              style: TextStyle(
+                                                                  fontSize: 18),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        content: Text(
+                                                          'Do you want to book this slot?\n\nTime: ${formatTime(slot.startTime)} - ${formatTime(slot.endTime)}',
+                                                          style: textTheme
+                                                              .bodyMedium,
+                                                        ),
+                                                        actions: [
+                                                          TextButton(
+                                                            onPressed: () =>
+                                                                Get.back(
+                                                                    result:
+                                                                        false),
+                                                            child: const Text(
+                                                                'Cancel'),
+                                                          ),
+                                                          ElevatedButton(
+                                                            style:
+                                                                ElevatedButton
+                                                                    .styleFrom(
+                                                              backgroundColor:
+                                                                  colorScheme
+                                                                      .primary,
+                                                              foregroundColor:
+                                                                  colorScheme
+                                                                      .onPrimary,
+                                                              shape: RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              12)),
+                                                            ),
+                                                            onPressed: () =>
+                                                                Get.back(
+                                                                    result:
+                                                                        true),
+                                                            child: const Text(
+                                                                'Confirm'),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                    if (confirmed == true) {
+                                                      await stationController
+                                                          .bookSlot(
+                                                        stationName:
+                                                            station.stationName,
+                                                        address:
+                                                            station.address,
+                                                        portId: port.id,
+                                                        slotId: slot.id,
+                                                        startTime:
+                                                            slot.startTime,
+                                                        endTime: slot.startTime,
+                                                        totalPrice:
+                                                            port.pricing,
+                                                      );
+                                                      Get.snackbar(
+                                                        'Booking Confirmed',
+                                                        'Your slot has been booked successfully!',
+                                                        backgroundColor:
+                                                            colorScheme.primary,
+                                                        colorText: colorScheme
+                                                            .onPrimary,
+                                                        snackPosition:
+                                                            SnackPosition
+                                                                .BOTTOM,
+                                                        margin: const EdgeInsets
+                                                            .all(16),
+                                                        borderRadius: 16,
+                                                        icon: Icon(
+                                                            Icons.check_circle,
+                                                            color: colorScheme
+                                                                .onPrimary),
+                                                        duration:
+                                                            const Duration(
+                                                                seconds: 3),
+                                                      );
+                                                    }
+                                                  },
+                                                  style:
+                                                      OutlinedButton.styleFrom(
+                                                    side: BorderSide(
+                                                        color:
+                                                            colorScheme.primary,
+                                                        width: 1),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12)),
+                                                    foregroundColor:
+                                                        colorScheme.primary,
+                                                  ),
+                                                  child: const Text('Book'),
+                                                )
+                                              : null,
+                                        ),
+                                      );
+                                    })),
+                              ],
+                            ),
+                          ),
+                        );
+                      });
+                    }),
+                  ],
+                ),
+              ),
             ],
           ),
         );
