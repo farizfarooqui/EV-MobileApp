@@ -81,8 +81,7 @@ class AppTextField extends StatelessWidget {
                   icon: const Icon(Icons.check, color: colorSecondary),
                 ))
             : null,
-        prefixIcon: prefixIcon ??
-            Icon(Icons.person, color: Colors.grey),
+        prefixIcon: prefixIcon ?? const Icon(Icons.person, color: Colors.grey),
         filled: true,
         fillColor: fillColor ?? Colors.grey.withOpacity(0.2),
         border: OutlineInputBorder(
@@ -91,16 +90,16 @@ class AppTextField extends StatelessWidget {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
-          borderSide: const BorderSide(
-            color: Colors.grey,
+          borderSide: BorderSide(
+            // color: Colors.grey.withOpacity(0.4),
             width: 1.0,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
-          borderSide: const BorderSide(
+          borderSide: BorderSide(
               // color: readOnly ? constant.colorSecondary : Colors.white,
-              color: Colors.grey,
+              color: Colors.grey.withOpacity(0.4),
               width: 1.0),
         ),
       ),

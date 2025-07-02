@@ -5,6 +5,7 @@ import 'dart:math' as Math;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:nobile/Constants/Utils.dart';
@@ -16,6 +17,9 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class WelcomeScreenController extends GetxController {
   RxBool isLoading = false.obs;
+  RxBool isGoogleLoading = false.obs;
+  RxBool isLoadingFacebook = false.obs;
+
   var isAppleLoading = false.obs;
 
   var isPasswordObscured = true.obs;
@@ -86,9 +90,52 @@ class WelcomeScreenController extends GetxController {
     }
   }
 
+  Future<void> loginWithFacebook() async {
+    try {
+      isLoadingFacebook(true);
+      log('Attempting Facebook Sign-In...');
+
+      final LoginResult result = await FacebookAuth.instance.login();
+
+      if (result.status == LoginStatus.success) {
+        final AccessToken accessToken = result.accessToken!;
+        log('Facebook Access Token: ${accessToken.tokenString}');
+
+        final OAuthCredential facebookAuthCredential =
+            FacebookAuthProvider.credential(accessToken.tokenString);
+
+        final UserCredential userCredential = await FirebaseAuth.instance
+            .signInWithCredential(facebookAuthCredential);
+
+        final String? token = await userCredential.user?.getIdToken();
+
+        if (token != null) {
+          onSuccess(token);
+          log('Facebook Sign-In successful. User UID: ${userCredential.user?.uid}');
+        } else {
+          log('Failed to retrieve token after Facebook login.');
+          Utils.showError(
+              "Login Failed", "Could not retrieve authentication token.");
+        }
+      } else if (result.status == LoginStatus.cancelled) {
+        log('Facebook Sign-In cancelled by user.');
+        Utils.showError("Login Cancelled", "Facebook login was cancelled.");
+      } else {
+        log('Facebook Sign-In failed: ${result.message}');
+        Utils.showError("Login Failed", result.message ?? "Unknown error");
+      }
+    } catch (error) {
+      log('[Facebook Login] Error: $error');
+      Utils.showError(
+          "Login Failed", "Facebook Sign-In failed. Please try again.");
+    } finally {
+      isLoadingFacebook(false);
+    }
+  }
+
   Future<void> loginWithGoogle() async {
     try {
-      isLoading(true);
+      isGoogleLoading(true);
       log('Attempting Google Sign-In...');
 
       if (await GoogleSignIn().isSignedIn()) {
@@ -98,7 +145,7 @@ class WelcomeScreenController extends GetxController {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
       if (googleUser == null) {
-        isLoading(false);
+        isGoogleLoading(false);
         log('Google Sign-In canceled.');
         return;
       }
@@ -125,13 +172,13 @@ class WelcomeScreenController extends GetxController {
       if (error is FirebaseAuthException) {
         log('[Google Login] Login with Google failed: $error');
       }
-      isLoading(false);
+      isGoogleLoading(false);
       log('[Google Login] Login with Google failed: $error');
       Utils.showError(
           "Login Failed", "Google Sign-In failed. Please try again.");
       // isLoading.value = false;
     } finally {
-      isLoading(false);
+      isGoogleLoading(false);
     }
   }
 

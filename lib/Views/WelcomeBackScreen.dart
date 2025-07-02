@@ -4,8 +4,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
 import 'package:nobile/Controller/WelcomeBackController.dart';
-import 'package:nobile/Views/LoginWithEmail.dart';
-import 'package:nobile/Views/Widgets/CustomElevatedButton.dart';
+import 'package:nobile/Views/CreateAccountScreen.dart';
+import 'package:nobile/Views/Widgets/AppTextField.dart';
+import 'package:nobile/Views/Widgets/GradientLoaderButton.dart';
 import 'package:nobile/Views/Widgets/SmallLoader.dart';
 import 'package:nobile/Views/Widgets/SocialMediaButton.dart';
 
@@ -17,138 +18,291 @@ class WelcomeBackScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: colorSecondary,
+      backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(height: Get.height * 0.2),
-              const Text(
-                "Welcome Back 👋",
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: colorBlack,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                "Login to continue using your account",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: colorBlack,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 40),
-
-              /// Login Options
-              CustomElevatedButton(
-                text: "Login with Email",
-                iconPath: "assets/SVG/email.svg",
-                onpress: () => Get.to(() => LoginWithEmailScreen()),
-              ),
-              const SizedBox(height: 16),
-              CustomElevatedButton(
-                backgroundColor: colorNavBar,
-                text: "Login with Phone",
-                iconPath: "assets/SVG/Phone.svg",
-                textColor: colorBlack,
-                onpress: () {
-                  // Get.to(() => LoginWithPhoneScreen());
-                },
-              ),
-              if (Platform.isIOS) ...[
-                const SizedBox(height: 16),
-                Obx(() => CustomElevatedButton(
-                      backgroundColor: Colors.black,
-                      text: "Login with Apple ID",
-                      iconPath: "assets/SVG/iphoneicon.svg",
-                      textColor: Colors.white,
-                      loading: controller.isAppleLoading.value,
-                      onpress: controller.signInWithApple,
-                    )),
-              ],
-              const SizedBox(height: 32),
-
-              /// Divider
-              const Row(
-                children: [
-                  Expanded(child: Divider(color: colorBlack)),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Text("OR",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: colorBlack)),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Glowing circle
+                Container(
+                  margin: const EdgeInsets.only(bottom: 32, top: 24),
+                  width: 60,
+                  height: 60,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.green,
+                        blurRadius: 60,
+                        spreadRadius: 10,
+                      ),
+                    ],
+                    color: Colors.green,
                   ),
-                  Expanded(child: Divider(color: colorBlack)),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              /// Google Button
-              Obx(() {
-                return GestureDetector(
-                  onTap: () {
-                    if (!controller.isLoading.value) {
-                      controller.loginWithGoogle();
-                    }
-                  },
-                  child: Container(
-                    height: 56,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(32),
-                      border: Border.all(color: Colors.grey.withOpacity(0.5)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (controller.isLoading.value)
-                          const SmallLoader(color: colorPrimary)
-                        else ...[
-                          SvgPicture.asset("assets/icons/google.svg",
-                              width: 24),
-                          const SizedBox(width: 12),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        "Login to your\naccount",
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          height: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
                           const Text(
-                            'Continue with Google',
+                            "Don't have an account? ",
                             style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                              fontFamily: "Poppins",
+                              color: Colors.white70,
+                              fontSize: 14,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Get.to(CreateAccountScreen());
+                            },
+                            child: const Text(
+                              "Sign Up",
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
                             ),
                           ),
                         ],
-                      ],
-                    ),
-                  ),
-                );
-              }),
-              const SizedBox(height: 32),
+                      ),
+                      const SizedBox(height: 32),
+                      // Email field
+                      AppTextField(
+                        controller: controller.emailController,
+                        hintName: "Email",
+                        style: const TextStyle(color: Colors.white),
+                        cursorColor: Colors.white,
+                        keyboardType: TextInputType.emailAddress,
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: SvgPicture.asset(
+                            "assets/SVG/email.svg",
+                            color: Colors.white54,
+                          ),
+                        ),
+                      ),
 
-              // /// Social Media
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              //   children: [
-              //     SocialMediaButton(
-              //       assetName: "assets/icons/facebook.svg",
-              //       onTap: () {
-              //         // controller.loginWithFacebook();
-              //       },
-              //     ),
-              //     SocialMediaButton(
-              //       assetName: "assets/icons/google.svg",
-              //       onTap: controller.loginWithGoogle,
-              //     ),
-              //   ],
-              // ),
-              // const SizedBox(height: 40),
-            ],
+                      const SizedBox(height: 16),
+                      // Password field
+                      Obx(() {
+                        return AppTextField(
+                          controller: controller.passwordController,
+                          hintName: "Password",
+                          style: const TextStyle(color: Colors.white),
+                          prefixIcon: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: SvgPicture.asset(
+                              "assets/SVG/password.svg",
+                              color: Colors.white54,
+                              width: 22,
+                            ),
+                          ),
+                          isSuffix: true,
+                          suffixIcon: GestureDetector(
+                            onTap: controller.togglePasswordVisibility,
+                            child: Padding(
+                              padding: const EdgeInsets.all(15.0),
+                              child: controller.isPasswordObscured.value
+                                  ? SvgPicture.asset(
+                                      'assets/SVG/eye-slash.svg',
+                                      color: Colors.white54,
+                                    )
+                                  : SvgPicture.asset(
+                                      'assets/SVG/eye.svg',
+                                      color: Colors.white54,
+                                    ),
+                            ),
+                          ),
+                          obscureText: controller.isPasswordObscured.value,
+                        );
+                      }),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () {/* Forgot password */},
+                            child: const Text(
+                              "Forgot Password?",
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // Login button
+                      Obx(() => GradientLoaderButton(
+                            isLoading: controller.isLoading.value,
+                            onPressed: controller.signInWithEmailAndPassword,
+                            text: "Login",
+                          )),
+
+                      const SizedBox(height: 24),
+                      const Row(
+                        children: [
+                          Expanded(child: Divider(color: Colors.white24)),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: Text("Or login with",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white38)),
+                          ),
+                          Expanded(child: Divider(color: Colors.white24)),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      // Social buttons
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          // Google Button
+                          Expanded(
+                            child: Obx(() => Container(
+                                  height: 48,
+                                  margin: const EdgeInsets.only(right: 8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF23203B),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(16),
+                                    onTap: controller.isGoogleLoading.value
+                                        ? null
+                                        : () => controller.loginWithGoogle(),
+                                    child: Center(
+                                      child: controller.isGoogleLoading.value
+                                          ? const SizedBox(
+                                              height: 24,
+                                              width: 24,
+                                              child: SmallLoader(
+                                                  color: Colors.white),
+                                            )
+                                          : Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                SvgPicture.asset(
+                                                    "assets/icons/google.svg",
+                                                    width: 22),
+                                                const SizedBox(width: 8),
+                                                const Text(
+                                                  "Google",
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                              ],
+                                            ),
+                                    ),
+                                  ),
+                                )),
+                          ),
+
+                          // Facebook Button
+                          Expanded(
+                            child: Obx(() => Container(
+                                  height: 48,
+                                  margin: const EdgeInsets.only(left: 8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF23203B),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(16),
+                                    onTap: controller.isLoadingFacebook.value
+                                        ? null
+                                        : () {
+                                            controller.loginWithFacebook();
+                                          },
+                                    child: Center(
+                                      child: controller.isLoadingFacebook.value
+                                          ? const SizedBox(
+                                              height: 24,
+                                              width: 24,
+                                              child: SmallLoader(
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                SvgPicture.asset(
+                                                    "assets/icons/social/facebook.svg",
+                                                    width: 22),
+                                                const SizedBox(width: 8),
+                                                const Text(
+                                                  "Facebook",
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                              ],
+                                            ),
+                                    ),
+                                  ),
+                                )),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 32),
+                      // Footer
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextButton(
+                            onPressed: () {/* Terms */},
+                            child: const Text(
+                              "Terms of use",
+                              style: TextStyle(
+                                  color: Colors.white38, fontSize: 13),
+                            ),
+                          ),
+                          const Text("|",
+                              style: TextStyle(color: Colors.white24)),
+                          TextButton(
+                            onPressed: () {/* Privacy */},
+                            child: const Text(
+                              "Privacy policy",
+                              style: TextStyle(
+                                  color: Colors.white38, fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

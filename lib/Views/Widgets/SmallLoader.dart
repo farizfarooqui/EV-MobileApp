@@ -17,7 +17,7 @@ class SmallLoader extends StatelessWidget {
             color: color,
           )
         : SizedBox(
-            height: 15,
+            height: 10,
             width: 15,
             child: CircularProgressIndicator(
               strokeWidth: 2,
