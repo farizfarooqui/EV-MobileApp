@@ -9,6 +9,7 @@ import 'package:nobile/Controller/StationController.dart';
 import 'package:nobile/Model/StationModel.dart';
 import 'package:nobile/Views/StationDetailsScreen.dart';
 import 'package:nobile/Views/StationFilterSheet.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -491,33 +492,45 @@ class StationDetailSheet extends StatelessWidget {
             ],
 
             /// Action Buttons
-            ElevatedButton(
-              onPressed: () {
-                controller.goToStation(stationJson);
-                Get.back();
+            OutlinedButton(
+              onPressed: () async {
+                final lat = station.location.latitude;
+                final lng = station.location.longitude;
+                final googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+                if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+                  await launchUrl(Uri.parse(googleMapsUrl), mode: LaunchMode.externalApplication);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Could not open Google Maps.')),
+                  );
+                }
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorPrimary,
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: colorPrimary, width: 1),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 minimumSize: const Size(double.infinity, 50),
+                foregroundColor: colorPrimary,
               ),
               child: const Text(
                 'Navigate',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 12),
-            ElevatedButton(
+            OutlinedButton(
               onPressed: () {
                 Get.to(() => StationDetailsScreen(stationId: station.id));
                 log("Station Id : ${station.id}");
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorPrimary,
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: colorPrimary, width: 1),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 minimumSize: const Size(double.infinity, 50),
+                foregroundColor: colorPrimary,
               ),
               child: const Text(
                 'Book Now',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ],
