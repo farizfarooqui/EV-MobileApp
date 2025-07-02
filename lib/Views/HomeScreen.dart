@@ -9,6 +9,7 @@ import 'package:nobile/Controller/StationController.dart';
 import 'package:nobile/Model/StationModel.dart';
 import 'package:nobile/Views/StationDetailsScreen.dart';
 import 'package:nobile/Views/StationFilterSheet.dart';
+import 'package:nobile/Views/Widgets/SmallLoader.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -23,17 +24,27 @@ class HomeScreen extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
-            child: FloatingActionButton(
-              heroTag: null,
-              onPressed: () {
-                controller.getCurrentLocation();
-              },
-              backgroundColor: colorNavBar,
-              child: const Icon(
-                Icons.my_location,
-                color: colorPrimary,
-              ),
-            ),
+            child: Obx(() => FloatingActionButton(
+                  heroTag: null,
+                  onPressed: controller.isLocating.value
+                      ? null
+                      : () {
+                          controller.getCurrentLocation();
+                        },
+                  backgroundColor: colorNavBar,
+                  child: controller.isLocating.value
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: SmallLoader(
+                            color: colorPrimary,
+                          ),
+                        )
+                      : const Icon(
+                          Icons.my_location,
+                          color: colorPrimary,
+                        ),
+                )),
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 90),
@@ -492,52 +503,57 @@ class StationDetailSheet extends StatelessWidget {
             ],
 
             /// Action Buttons
-            OutlinedButton(
-              onPressed: () async {
-                final lat = station.location.latitude;
-                final lng = station.location.longitude;
-                final googleMapsUrl =
-                    'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
-                if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
-                  await launchUrl(Uri.parse(googleMapsUrl),
-                      mode: LaunchMode.externalApplication);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Could not open Google Maps.')),
-                  );
-                }
-              },
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: colorPrimary, width: 1),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                minimumSize: const Size(double.infinity, 50),
-                foregroundColor: colorPrimary,
-              ),
-              child: const Text(
-                'Navigate',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-
-            const SizedBox(height: 12),
-            OutlinedButton(
-              onPressed: () {
-                Get.to(() => StationDetailsScreen(stationId: station.id));
-                log("Station Id : ${station.id}");
-              },
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: colorPrimary, width: 1),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                minimumSize: const Size(double.infinity, 50),
-                foregroundColor: colorPrimary,
-              ),
-              child: const Text(
-                'Book Now',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: _AnimatedActionButton(
+                    onPressed: () async {
+                      final lat = station.location.latitude;
+                      final lng = station.location.longitude;
+                      final googleMapsUrl =
+                          'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+                      if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+                        await launchUrl(Uri.parse(googleMapsUrl),
+                            mode: LaunchMode.externalApplication);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Could not open Google Maps.')),
+                        );
+                      }
+                    },
+                    icon: Icons.directions_car_filled,
+                    label: 'Navigate',
+                    backgroundColor: Colors.blue[600]!,
+                    iconColor: Colors.white,
+                    textColor: Colors.white,
+                    gradient: LinearGradient(
+                      colors: [Colors.blue[600]!, Colors.blue[800]!],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _AnimatedActionButton(
+                    onPressed: () {
+                      Get.to(() => StationDetailsScreen(stationId: station.id));
+                      log("Station Id : ${station.id}");
+                    },
+                    icon: Icons.calendar_today_rounded,
+                    label: 'Book Now',
+                    backgroundColor: colorPrimary,
+                    iconColor: Colors.white,
+                    textColor: Colors.white,
+                    gradient: LinearGradient(
+                      colors: [colorPrimary, colorPrimary.withOpacity(0.8)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -629,6 +645,145 @@ class StationDetailSheet extends StatelessWidget {
             ),
           )
         ],
+      ),
+    );
+  }
+}
+
+class _AnimatedActionButton extends StatefulWidget {
+  final VoidCallback onPressed;
+  final IconData icon;
+  final String label;
+  final Color backgroundColor;
+  final Color iconColor;
+  final Color textColor;
+  final Gradient? gradient;
+
+  const _AnimatedActionButton({
+    required this.onPressed,
+    required this.icon,
+    required this.label,
+    required this.backgroundColor,
+    required this.iconColor,
+    required this.textColor,
+    this.gradient,
+  });
+
+  @override
+  State<_AnimatedActionButton> createState() => _AnimatedActionButtonState();
+}
+
+class _AnimatedActionButtonState extends State<_AnimatedActionButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _iconAnimation;
+  bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+    _iconAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.2,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.elasticOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) {
+        setState(() => _isPressed = true);
+        _animationController.forward();
+      },
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        _animationController.reverse();
+        widget.onPressed();
+      },
+      onTapCancel: () {
+        setState(() => _isPressed = false);
+        _animationController.reverse();
+      },
+      child: AnimatedBuilder(
+        animation: _animationController,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: Container(
+              height: 56,
+              decoration: BoxDecoration(
+                gradient: widget.gradient,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: widget.backgroundColor.withOpacity(0.3),
+                    blurRadius: _isPressed ? 8 : 12,
+                    offset: Offset(0, _isPressed ? 2 : 4),
+                    spreadRadius: _isPressed ? 0 : 1,
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: widget.onPressed,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedBuilder(
+                          animation: _iconAnimation,
+                          builder: (context, child) {
+                            return Transform.scale(
+                              scale: _iconAnimation.value,
+                              child: Icon(
+                                widget.icon,
+                                color: widget.iconColor,
+                                size: 24,
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          widget.label,
+                          style: TextStyle(
+                            color: widget.textColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }

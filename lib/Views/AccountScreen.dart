@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nobile/Views/MyVehicle/my_vehicle_screen.dart';
+import 'package:nobile/Views/MyVehicle/MyVehicleScreen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});

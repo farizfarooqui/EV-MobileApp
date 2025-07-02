@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
-
+import 'dart:math';
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -17,6 +18,7 @@ class StationController extends GetxController {
   RxString searchText = ''.obs;
   final RxBool showSearch = false.obs;
   final Rx<Position?> currentPosition = Rx<Position?>(null);
+  final RxBool isLocating = false.obs;
   late final MapController mapController;
   late StreamSubscription<QuerySnapshot> _stationsSubscription;
   final TextEditingController searchController = TextEditingController();
@@ -101,15 +103,15 @@ class StationController extends GetxController {
     filteredStations.value = stations.where((station) {
       // Check charger types
       if (selectedChargerTypes.isNotEmpty) {
-        final hasSelectedType = station.ports.any((port) =>
-            selectedChargerTypes.contains(port.type));
+        final hasSelectedType = station.ports
+            .any((port) => selectedChargerTypes.contains(port.type));
         if (!hasSelectedType) return false;
       }
 
       // Check amenities
       if (selectedAmenities.isNotEmpty) {
-        final hasAllAmenities = selectedAmenities.every(
-            (amenity) => station.amenities.contains(amenity));
+        final hasAllAmenities = selectedAmenities
+            .every((amenity) => station.amenities.contains(amenity));
         if (!hasAllAmenities) return false;
       }
 
@@ -150,33 +152,90 @@ class StationController extends GetxController {
 
   Future<void> getCurrentLocation() async {
     try {
+      isLocating.value = true;
       var status = await Permission.location.request();
       if (status.isGranted) {
         Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high,
         );
         currentPosition.value = position;
-        mapController.move(
-          LatLng(position.latitude, position.longitude),
-          16.0,
-        );
+
+        // Smooth animation to current location
+        _animateToLocation(LatLng(position.latitude, position.longitude));
       } else {
-        log("Please grant location permission to use this feature.");
+        // log("Please grant location permission to use this feature.");
       }
     } catch (e) {
-      log("Error getting location: ${e.toString()}");
+      // log("Error getting location: ${e.toString()}");
+    } finally {
+      isLocating.value = false;
     }
+  }
+
+  void _animateToLocation(LatLng targetLocation) {
+    const Duration animationDuration = Duration(milliseconds: 1500);
+    const int steps = 60; // 60 steps for smooth animation
+    final Duration stepDuration =
+        Duration(milliseconds: animationDuration.inMilliseconds ~/ steps);
+
+    // Get current map position
+    final currentCenter = mapController.camera.center;
+    final currentZoom = mapController.camera.zoom;
+    const targetZoom = 16.0;
+
+    // Calculate the difference
+    final latDiff = targetLocation.latitude - currentCenter.latitude;
+    final lngDiff = targetLocation.longitude - currentCenter.longitude;
+    final zoomDiff = targetZoom - currentZoom;
+
+    Timer.periodic(stepDuration, (timer) {
+      final progress = timer.tick / steps;
+      final easedProgress = _easeInOutCubic(progress);
+
+      final newLat = currentCenter.latitude + (latDiff * easedProgress);
+      final newLng = currentCenter.longitude + (lngDiff * easedProgress);
+      final newZoom = currentZoom + (zoomDiff * easedProgress);
+
+      mapController.move(
+        LatLng(newLat, newLng),
+        newZoom,
+      );
+
+      if (timer.tick >= steps) {
+        timer.cancel();
+        // Ensure we end up exactly at the target location
+        mapController.move(
+          targetLocation,
+          targetZoom,
+        );
+
+        // Add a subtle bounce effect by slightly zooming out and back in
+        Timer(const Duration(milliseconds: 200), () {
+          mapController.move(
+            targetLocation,
+            targetZoom - 0.5,
+          );
+          Timer(const Duration(milliseconds: 300), () {
+            mapController.move(
+              targetLocation,
+              targetZoom,
+            );
+          });
+        });
+      }
+    });
+  }
+
+  double _easeInOutCubic(double t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - pow(-2 * t + 2, 3) / 2;
   }
 
   void goToStation(Map<String, dynamic> station) {
     try {
       final location = station['location'] as GeoPoint;
-      mapController.move(
-        LatLng(location.latitude, location.longitude),
-        16.0,
-      );
+      _animateToLocation(LatLng(location.latitude, location.longitude));
     } catch (e) {
-      log("Error moving to station: ${e.toString()}");
+      // log("Error moving to station: ${e.toString()}");
       Get.snackbar(
         'Error',
         'Could not navigate to station location',

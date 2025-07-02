@@ -18,7 +18,7 @@ class SmallLoader extends StatelessWidget {
           )
         : SizedBox(
             height: 10,
-            width: 15,
+            width: 10,
             child: CircularProgressIndicator(
               strokeWidth: 2,
               valueColor: AlwaysStoppedAnimation<Color>(color),
