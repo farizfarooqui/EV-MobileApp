@@ -17,6 +17,7 @@ class CreateAccountController extends GetxController {
   var isloading = false.obs;
   late final TextEditingController emailController;
   late final TextEditingController passwordController;
+  late final TextEditingController nameController;
 
   void togglePasswordVisibility() {
     isPasswordObscured.value = !isPasswordObscured.value;
@@ -31,7 +32,10 @@ class CreateAccountController extends GetxController {
   }
 
   void handleContinue() {
-    if (emailController.text.isEmpty && passwordController.text.isEmpty) {
+    if (nameController.text.isEmpty) {
+      Utils.showError('Missing Name', 'Please enter your name.');
+      return;
+    } else if (emailController.text.isEmpty && passwordController.text.isEmpty) {
       Utils.showError("Ah Snap!", "Please provide credentials");
     } else if (emailController.text.isEmpty) {
       Utils.showError('Missing Email', 'Please enter your email address.');
@@ -49,6 +53,7 @@ class CreateAccountController extends GetxController {
 
   Future<void> signUpWithEmailAndPassword() async {
     log("[signUpWithEmailAndPassword] : ");
+    log("Name : "+nameController.text);
     log("Email : ${emailController.text}");
     log("Password : ${passwordController.text}");
     try {
@@ -92,6 +97,7 @@ class CreateAccountController extends GetxController {
       final userData = {
         'uid': user.uid,
         'email': user.email,
+        'name': nameController.text,
         'createdAt': Timestamp.now(),
         'isVerified': user.emailVerified,
       };
@@ -123,12 +129,14 @@ class CreateAccountController extends GetxController {
   void onInit() {
     // TODO: implement onInit
     super.onInit();
+    nameController = TextEditingController();
     emailController = TextEditingController();
     passwordController = TextEditingController();
   }
 
   @override
   void onClose() {
+    nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     super.onClose();

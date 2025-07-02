@@ -19,17 +19,14 @@ class CreateAccountScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus!.unfocus(),
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: colorSecondary,
-        ),
+        resizeToAvoidBottomInset: false,
         backgroundColor: colorSecondary,
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            // padding: const EdgeInsets.fromLTRB(24, 10, 24, 24),
-            child: SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: Get.height * 0.8),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 50),
+              child: SizedBox(
+                width: 400,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -57,12 +54,27 @@ class CreateAccountScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 48),
                     AppTextField(
+                      controller: controller.nameController,
+                      hintName: 'Full Name',
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: SvgPicture.asset(
+                          "assets/SVG/person.svg",
+                          color: Colors.grey,
+                          height: 20,
+                          width: 20,
+                        ),
+                      ),
+                      keyboardType: TextInputType.name,
+                    ),
+                    const SizedBox(height: 16),
+                    AppTextField(
                       controller: controller.emailController,
                       hintName: 'Email',
                       prefixIcon: Padding(
                         padding: const EdgeInsets.all(15.0),
                         child: SvgPicture.asset(
-                          "assets/icons/email.svg",
+                          "assets/SVG/email.svg",
                           color: colorBlack,
                         ),
                       ),
@@ -76,7 +88,7 @@ class CreateAccountScreen extends StatelessWidget {
                           prefixIcon: Padding(
                             padding: const EdgeInsets.all(15.0),
                             child: SvgPicture.asset(
-                              "assets/icons/password.svg",
+                              "assets/SVG/password.svg",
                               height: 18,
                               width: 18,
                               color: colorBlack,
@@ -88,11 +100,11 @@ class CreateAccountScreen extends StatelessWidget {
                               padding: const EdgeInsets.all(15.0),
                               child: controller.isPasswordObscured.value
                                   ? SvgPicture.asset(
-                                      'assets/icons/eye-slash.svg',
+                                      'assets/SVG/eye-slash.svg',
                                       color: colorBlack,
                                     )
                                   : SvgPicture.asset(
-                                      'assets/icons/eye.svg',
+                                      'assets/SVG/eye.svg',
                                       color: colorBlack,
                                     ),
                             ),

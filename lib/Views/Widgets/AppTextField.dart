@@ -26,6 +26,9 @@ class AppTextField extends StatelessWidget {
 
   final List<TextInputFormatter>? inputFormatters;
 
+  final double borderRadius;
+  final List<BoxShadow>? boxShadow;
+
   const AppTextField({
     super.key,
     required this.controller,
@@ -45,6 +48,8 @@ class AppTextField extends StatelessWidget {
     this.fillColor,
     this.hintColor,
     this.isSuffix = false,
+    this.borderRadius = 12.0,
+    this.boxShadow,
   });
 
   @override
@@ -76,22 +81,23 @@ class AppTextField extends StatelessWidget {
                   icon: const Icon(Icons.check, color: colorSecondary),
                 ))
             : null,
-        prefixIcon: prefixIcon,
+        prefixIcon: prefixIcon ??
+            Icon(Icons.person, color: Colors.grey),
         filled: true,
         fillColor: fillColor ?? Colors.grey.withOpacity(0.2),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(borderRadius),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(borderRadius),
           borderSide: const BorderSide(
             color: Colors.grey,
             width: 1.0,
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(borderRadius),
           borderSide: const BorderSide(
               // color: readOnly ? constant.colorSecondary : Colors.white,
               color: Colors.grey,

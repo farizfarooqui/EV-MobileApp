@@ -56,10 +56,6 @@ class AccountScreen extends StatelessWidget {
                           icon: Icons.card_giftcard,
                           text: 'Promo code',
                           onTap: () {}),
-                      _ProfileRow(
-                          icon: Icons.language, text: 'Language', onTap: () {}),
-                      _ProfileRow(
-                          icon: Icons.logout, text: 'Log out', onTap: () {}),
                     ],
                   ),
                 ),

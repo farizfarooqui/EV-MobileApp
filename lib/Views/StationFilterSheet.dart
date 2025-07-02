@@ -40,157 +40,162 @@ class StationFilterSheet extends StatelessWidget {
       minChildSize: 0.4,
       maxChildSize: 0.9,
       builder: (context, scrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, -2),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              // Drag Handle
-              Container(
-                margin: const EdgeInsets.only(top: 8),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
+        return Obx(
+          () => Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(20)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
                 ),
-              ),
-              Expanded(
-                child: ListView(
-                  controller: scrollController,
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    // Header
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Filter Stations',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            controller.clearFilters();
-                          },
-                          child: const Text('Reset'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Filter Sections
-                    // Charger Types
-                    _buildSectionTitle('Charger Types'),
-                    _buildMultiSelectChips(
-                      chargerTypes,
-                      controller.selectedChargerTypes,
-                      (types) => controller.updateChargerTypeFilter(types),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Amenities
-                    _buildSectionTitle('Amenities'),
-                    _buildMultiSelectChips(
-                      amenities,
-                      controller.selectedAmenities,
-                      (amenities) =>
-                          controller.updateAmenitiesFilter(amenities),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Payment Methods
-                    _buildSectionTitle('Payment Methods'),
-                    _buildMultiSelectChips(
-                      paymentMethods,
-                      controller.selectedPaymentMethods,
-                      (methods) =>
-                          controller.updatePaymentMethodFilter(methods),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Price Range
-                    _buildSectionTitle('Price Range'),
-                    Obx(() {
-                      final minValue =
-                          controller.minPricePerKwh.value.clamp(0.0, 100.0);
-                      final maxValue = controller.maxPricePerKwh.value
-                          .clamp(minValue, 100.0);
-
-                      return Column(
+              ],
+            ),
+            child: Column(
+              children: [
+                // Drag Handle
+                Container(
+                  margin: const EdgeInsets.only(top: 8),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Expanded(
+                  child: ListView(
+                    controller: scrollController,
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      // Header
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          RangeSlider(
-                            values: RangeValues(minValue, maxValue),
-                            min: 0,
-                            max: 100,
-                            divisions: 20,
-                            labels: RangeLabels(
-                              '\$${minValue.toStringAsFixed(2)}',
-                              '\$${maxValue.toStringAsFixed(2)}',
+                          const Text(
+                            'Filter Stations',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
                             ),
-                            onChanged: (values) {
-                              controller.updatePricePerKwhFilter(
-                                values.start,
-                                values.end,
-                              );
-                            },
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('\$${minValue.toStringAsFixed(2)}'),
-                                Text('\$${maxValue.toStringAsFixed(2)}'),
-                              ],
-                            ),
+                          TextButton(
+                            onPressed: () {
+                              controller.clearFilters();
+                            },
+                            child: const Text('Reset'),
                           ),
                         ],
-                      );
-                    }),
-                    const SizedBox(height: 16),
+                      ),
+                      const SizedBox(height: 16),
 
-                    // Quick Filters
-                    _buildSectionTitle('Quick Filters'),
-                    _buildQuickFilters(),
-                    const SizedBox(height: 16),
+                      // Filter Sections
+                      // Charger Types
+                      _buildSectionTitle('Charger Types'),
+                      _buildMultiSelectChips(
+                        chargerTypes,
+                        controller.selectedChargerTypes,
+                        (types) => controller.updateChargerTypeFilter(types),
+                      ),
+                      const SizedBox(height: 16),
 
-                    // Apply Button
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Get.back();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorPrimary,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        child: const Text(
-                          'Apply Filters',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
+                      // Amenities
+                      _buildSectionTitle('Amenities'),
+                      _buildMultiSelectChips(
+                        amenities,
+                        controller.selectedAmenities,
+                        (amenities) =>
+                            controller.updateAmenitiesFilter(amenities),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Payment Methods
+                      _buildSectionTitle('Payment Methods'),
+                      _buildMultiSelectChips(
+                        paymentMethods,
+                        controller.selectedPaymentMethods,
+                        (methods) =>
+                            controller.updatePaymentMethodFilter(methods),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Price Range
+                      _buildSectionTitle('Price Range'),
+                      Obx(() {
+                        final minValue =
+                            controller.minPricePerKwh.value.clamp(0.0, 100.0);
+                        final maxValue = controller.maxPricePerKwh.value
+                            .clamp(minValue, 100.0);
+
+                        return Column(
+                          children: [
+                            RangeSlider(
+                              values: RangeValues(minValue, maxValue),
+                              min: 0,
+                              max: 100,
+                              divisions: 20,
+                              labels: RangeLabels(
+                                '\$${minValue.toStringAsFixed(2)}',
+                                '\$${maxValue.toStringAsFixed(2)}',
+                              ),
+                              onChanged: (values) {
+                                controller.updatePricePerKwhFilter(
+                                  values.start,
+                                  values.end,
+                                );
+                              },
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('\$${minValue.toStringAsFixed(2)}'),
+                                  Text('\$${maxValue.toStringAsFixed(2)}'),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+                      const SizedBox(height: 16),
+
+                      // Quick Filters
+                      _buildSectionTitle('Quick Filters'),
+                      _buildQuickFilters(),
+                      const SizedBox(height: 16),
+
+                      // Apply Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Get.back();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorPrimary,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          child: const Text(
+                            'Apply Filters',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
