@@ -23,17 +23,32 @@ class BookingController extends GetxController
 
   Future<void> fetchUserBookings() async {
     final now = DateTime.now();
-
     final user = await UserPreferences.getUser();
     if (user == null || user['uid'] == null) return;
-
     final query = await FirebaseFirestore.instance
         .collection('bookings')
         .where('userId', isEqualTo: user['uid'])
         .orderBy('startTime', descending: true)
         .get();
-
     allBookings = query.docs.map((doc) {
+      final data = doc.data();
+      return Booking.fromJson(data);
+    }).toList();
+    for (final booking in allBookings) {
+      if (booking.status.toLowerCase() == 'active' &&
+          booking.endTime.isBefore(now)) {
+        await FirebaseFirestore.instance
+            .collection('bookings')
+            .doc(booking.id)
+            .update({'status': 'Completed'});
+      }
+    }
+    final updatedQuery = await FirebaseFirestore.instance
+        .collection('bookings')
+        .where('userId', isEqualTo: user['uid'])
+        .orderBy('startTime', descending: true)
+        .get();
+    allBookings = updatedQuery.docs.map((doc) {
       final data = doc.data();
       return Booking.fromJson(data);
     }).toList();
@@ -44,14 +59,12 @@ class BookingController extends GetxController
         .toList();
 
     completedBookings = allBookings
-        .where((b) =>
-            b.status.toLowerCase() == 'active' && b.endTime.compareTo(now) <= 0)
+        .where((b) => b.status.toLowerCase() == 'completed')
         .toList();
 
     canceledBookings =
         allBookings.where((b) => b.status.toLowerCase() == 'canceled').toList();
-
-    update(); // Notify UI
+    update();
   }
 
   Future<bool> cancelBooking(String bookingId) async {
