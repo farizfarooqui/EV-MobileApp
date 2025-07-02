@@ -13,95 +13,146 @@ class MyBookingScreen extends StatelessWidget {
   }
 
   Widget _buildBookingCard(Booking booking, bool isActive) {
+    final theme =
+        Get.context != null ? Theme.of(Get.context!) : ThemeData.dark();
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      color: colorScheme.surface,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Booking #${booking.id.substring(0, 8)}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                Container(
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  child: Icon(Icons.ev_station,
+                      color: colorScheme.primary, size: 32),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        booking.stationName ?? 'EV Station',
+                        style: textTheme.titleLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(Icons.location_on,
+                              color: colorScheme.primary, size: 16),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              booking.address ?? '',
+                              style: textTheme.bodySmall?.copyWith(
+                                  color:
+                                      colorScheme.onSurface.withOpacity(0.7)),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: booking.status == 'approved'
+                    color: booking.status.toLowerCase() == 'active'
                         ? Colors.green
-                        : booking.status == 'pending'
-                            ? Colors.orange
-                            : Colors.red,
+                        : booking.status.toLowerCase() == 'canceled'
+                            ? Colors.red
+                            : Colors.orange,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    booking.status.toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                    ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        booking.status.toLowerCase() == 'active'
+                            ? Icons.check_circle
+                            : booking.status.toLowerCase() == 'canceled'
+                                ? Icons.cancel
+                                : Icons.hourglass_bottom,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        booking.status.toUpperCase(),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            Text('Start Time: ${formatDateTime(booking.startTime)}'),
-            Text('End Time: ${formatDateTime(booking.endTime)}'),
-            Text('Total Price: \$${booking.totalPrice.toStringAsFixed(2)}'),
-            if (isActive && booking.status == 'approved') ...[
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () async {
-                      final result = await Get.dialog<bool>(
-                        AlertDialog(
-                          title: const Text('Cancel Booking'),
-                          content: const Text(
-                              'Are you sure you want to cancel this booking?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Get.back(result: false),
-                              child: const Text('No'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () => Get.back(result: true),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                              ),
-                              child: const Text('Yes, Cancel'),
-                            ),
-                          ],
-                        ),
-                      );
-
-                      if (result == true) {
-                        final success =
-                            await bookingController.cancelBooking(booking.id);
-                        if (success) {
-                          Get.snackbar(
-                            'Success',
-                            'Booking cancelled successfully',
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: Colors.green,
-                            colorText: Colors.white,
-                          );
-                        }
-                      }
-                    },
-                    child: const Text('Cancel Booking'),
-                  ),
-                ],
-              ),
-            ],
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Icon(Icons.calendar_today,
+                    color: colorScheme.primary, size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  'Start: ${formatDateTime(booking.startTime)}',
+                  style: textTheme.bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Icon(Icons.access_time, color: colorScheme.primary, size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  'End: ${formatDateTime(booking.endTime)}',
+                  style: textTheme.bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Icon(Icons.attach_money, color: colorScheme.primary, size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  'Total: ₹${booking.totalPrice.toStringAsFixed(2)}',
+                  style: textTheme.bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Booking ID: ${booking.id.substring(0, 8)}',
+              style: textTheme.bodySmall
+                  ?.copyWith(color: colorScheme.onSurface.withOpacity(0.5)),
+            ),
           ],
         ),
       ),

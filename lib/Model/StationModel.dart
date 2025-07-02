@@ -60,6 +60,9 @@ class Slot {
 
 class Booking {
   final String id;
+  final String? stationName;
+  final String? address;
+
   final String stationId;
   final String portId;
   final String userId;
@@ -72,6 +75,8 @@ class Booking {
 
   Booking({
     required this.id,
+    required this.stationName,
+    required this.address,
     required this.stationId,
     required this.portId,
     required this.userId,
@@ -86,6 +91,8 @@ class Booking {
   factory Booking.fromJson(Map<String, dynamic> json) {
     return Booking(
       id: json['id'] ?? '',
+      stationName: json['stationName'] ?? '',
+      address: json['address'] ?? '',
       stationId: json['stationId'] ?? '',
       portId: json['portId'] ?? '',
       userId: json['userId'] ?? '',
@@ -101,6 +108,8 @@ class Booking {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'stationName': stationName,
+      'address': address,
       'stationId': stationId,
       'portId': portId,
       'userId': userId,
