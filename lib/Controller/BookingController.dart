@@ -67,15 +67,52 @@ class BookingController extends GetxController
     update();
   }
 
-  Future<bool> cancelBooking(String bookingId) async {
+  Future<bool> cancelBooking({
+    required String portId,
+    required String slotId,
+    required String stationId,
+    required String bookingId,
+  }) async {
     try {
+      final docRef = FirebaseFirestore.instance
+          .collection('chargingStations')
+          .doc(stationId);
+
+      final docSnapshot = await docRef.get();
+      if (!docSnapshot.exists) return false;
+
+      final data = docSnapshot.data();
+      if (data == null) return false;
+
+      final List<dynamic> ports = data['ports'];
+
+      final updatedPorts = ports.map((port) {
+        if (port['id'] == portId) {
+          final List<dynamic> slots = port['slots'];
+          final updatedSlots = slots.map((slot) {
+            if (slot['id'] == slotId) {
+              return {
+                ...slot,
+                'isBooked': false,
+                'bookingId': null,
+              };
+            }
+            return slot;
+          }).toList();
+
+          return {
+            ...port,
+            'slots': updatedSlots,
+          };
+        }
+        return port;
+      }).toList();
+      await docRef.update({'ports': updatedPorts});
       await FirebaseFirestore.instance
           .collection('bookings')
           .doc(bookingId)
-          .update({
-        'status': 'Canceled',
-      });
-      fetchUserBookings(); // Refresh list
+          .update({'status': 'Canceled'});
+      fetchUserBookings();
       return true;
     } catch (e) {
       print("Cancel booking error: $e");

@@ -89,16 +89,9 @@ class StationDetailsController extends GetxController {
       return port;
     }).toList();
     await docRef.update({'ports': updatedPorts});
-    // Get.back();
-    // Get.snackbar(
-    //   'Success',
-    //   'Booking created successfully',
-    //   snackPosition: SnackPosition.BOTTOM,
-    //   backgroundColor: Colors.green,
-    //   colorText: Colors.white,
-    // );
     await FirebaseFirestore.instance.collection('bookings').doc(bookingId).set({
       'id': bookingId,
+      'slotId': slotId,
       'stationId': stationId,
       'portId': portId,
       'userId': user?['uid'],

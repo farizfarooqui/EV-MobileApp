@@ -65,6 +65,8 @@ class Booking {
 
   final String stationId;
   final String portId;
+  final String slotId;
+
   final String userId;
   final DateTime startTime;
   final DateTime endTime;
@@ -79,6 +81,7 @@ class Booking {
     required this.address,
     required this.stationId,
     required this.portId,
+    required this.slotId,
     required this.userId,
     required this.startTime,
     required this.endTime,
@@ -95,6 +98,7 @@ class Booking {
       address: json['address'] ?? '',
       stationId: json['stationId'] ?? '',
       portId: json['portId'] ?? '',
+      slotId: json['slotId'] ?? '',
       userId: json['userId'] ?? '',
       startTime: (json['startTime'] as Timestamp).toDate(),
       endTime: (json['endTime'] as Timestamp).toDate(),
@@ -112,6 +116,7 @@ class Booking {
       'address': address,
       'stationId': stationId,
       'portId': portId,
+      'slotId': slotId,
       'userId': userId,
       'startTime': Timestamp.fromDate(startTime),
       'endTime': Timestamp.fromDate(endTime),

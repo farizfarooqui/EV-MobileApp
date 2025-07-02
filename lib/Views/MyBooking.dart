@@ -209,8 +209,12 @@ class MyBookingScreen extends StatelessWidget {
                             ),
                           );
                           if (confirmed == true) {
-                            final success = await bookingController
-                                .cancelBooking(booking.id);
+                            final success =
+                                await bookingController.cancelBooking(
+                                    bookingId: booking.id,
+                                    portId: booking.portId,
+                                    slotId: booking.slotId,
+                                    stationId: booking.stationId);
                             if (success) {
                               Get.snackbar(
                                 'Booking Canceled',
