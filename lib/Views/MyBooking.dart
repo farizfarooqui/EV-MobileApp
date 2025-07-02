@@ -1,22 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:nobile/Constants/Constants.dart';
 import 'package:nobile/Controller/BookingController.dart';
 import 'package:nobile/Model/StationModel.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class MyBookingScreen extends StatelessWidget {
   MyBookingScreen({super.key});
   final BookingController bookingController = Get.put(BookingController());
+  final RefreshController _activeRefreshController = RefreshController();
+  final RefreshController _completedRefreshController = RefreshController();
+  final RefreshController _canceledRefreshController = RefreshController();
 
   String formatDateTime(DateTime dateTime) {
     return DateFormat('MMM dd, yyyy h:mm a').format(dateTime);
   }
 
-  Widget _buildBookingCard(Booking booking, bool isActive) {
+  Widget _buildBookingCard(
+    Booking booking,
+    bool isActive,
+    RefreshController controller,
+  ) {
     final theme =
         Get.context != null ? Theme.of(Get.context!) : ThemeData.dark();
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final now = DateTime.now();
+    final isCancelable = booking.status.toLowerCase() == 'active' &&
+        booking.endTime.isAfter(now);
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       elevation: 4,
@@ -148,10 +160,102 @@ class MyBookingScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            Text(
-              'Booking ID: ${booking.id.substring(0, 8)}',
-              style: textTheme.bodySmall
-                  ?.copyWith(color: colorScheme.onSurface.withOpacity(0.5)),
+            Row(
+              children: [
+                Text(
+                  'Booking ID: ${booking.id.substring(0, 8)}',
+                  style: textTheme.bodySmall
+                      ?.copyWith(color: colorScheme.onSurface.withOpacity(0.5)),
+                ),
+                const Spacer(),
+                isCancelable
+                    ? GestureDetector(
+                        onTap: () async {
+                          final confirmed = await Get.dialog<bool>(
+                            AlertDialog(
+                              backgroundColor: colorScheme.surface,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20)),
+                              title: Row(
+                                children: [
+                                  Icon(Icons.cancel,
+                                      color: Colors.red, size: 32),
+                                  const SizedBox(width: 8),
+                                  const Text('Cancel Booking',
+                                      style: TextStyle(fontSize: 18)),
+                                ],
+                              ),
+                              content: Text(
+                                'Are you sure you want to cancel this booking?\nThis action cannot be undone.',
+                                style: textTheme.bodyMedium,
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Get.back(result: false),
+                                  child: const Text('No'),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                  ),
+                                  onPressed: () => Get.back(result: true),
+                                  child: const Text('Yes, Cancel'),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirmed == true) {
+                            final success = await bookingController
+                                .cancelBooking(booking.id);
+                            if (success) {
+                              Get.snackbar(
+                                'Booking Canceled',
+                                'Your booking has been canceled.',
+                                backgroundColor: Colors.red,
+                                colorText: Colors.white,
+                                snackPosition: SnackPosition.BOTTOM,
+                                margin: const EdgeInsets.all(16),
+                                borderRadius: 16,
+                                icon: const Icon(Icons.cancel,
+                                    color: Colors.white),
+                                duration: const Duration(seconds: 3),
+                              );
+                              await bookingController.fetchUserBookings();
+                            }
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(
+                                Icons.cancel,
+                                color: Colors.red,
+                                size: 16,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'Cancel',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ],
             ),
           ],
         ),
@@ -159,17 +263,27 @@ class MyBookingScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBookingList(List<Booking> bookings, bool isActive) {
+  Widget _buildBookingList(
+      List<Booking> bookings, bool isActive, RefreshController controller) {
     if (bookings.isEmpty) {
       return _buildEmptyState(Get.context!,
           'No ${isActive ? 'active' : 'completed'} bookings found.');
     }
-
-    return ListView.builder(
-      itemCount: bookings.length,
-      itemBuilder: (context, index) {
-        return _buildBookingCard(bookings[index], isActive);
+    return SmartRefresher(
+      controller: controller,
+      header: const WaterDropHeader(
+        waterDropColor: colorPrimary,
+      ),
+      onRefresh: () async {
+        await bookingController.fetchUserBookings();
+        controller.refreshCompleted();
       },
+      child: ListView.builder(
+        itemCount: bookings.length,
+        itemBuilder: (context, index) {
+          return _buildBookingCard(bookings[index], isActive, controller);
+        },
+      ),
     );
   }
 
@@ -252,9 +366,12 @@ class MyBookingScreen extends StatelessWidget {
         builder: (controller) => TabBarView(
           controller: controller.tabController,
           children: [
-            _buildBookingList(controller.activeBookings, true),
-            _buildBookingList(controller.completedBookings, false),
-            _buildBookingList(controller.canceledBookings, false),
+            _buildBookingList(
+                controller.activeBookings, true, _activeRefreshController),
+            _buildBookingList(controller.completedBookings, false,
+                _completedRefreshController),
+            _buildBookingList(
+                controller.canceledBookings, false, _canceledRefreshController),
           ],
         ),
       ),

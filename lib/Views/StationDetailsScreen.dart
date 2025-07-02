@@ -365,15 +365,15 @@ class StationDetailsScreen extends StatelessWidget {
                                                     if (confirmed == true) {
                                                       await stationController
                                                           .bookSlot(
+                                                        portId: port.id,
                                                         stationName:
                                                             station.stationName,
                                                         address:
                                                             station.address,
-                                                        portId: port.id,
                                                         slotId: slot.id,
                                                         startTime:
                                                             slot.startTime,
-                                                        endTime: slot.startTime,
+                                                        endTime: slot.endTime,
                                                         totalPrice:
                                                             port.pricing,
                                                       );
