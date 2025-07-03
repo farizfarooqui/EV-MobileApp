@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nobile/Controller/my_vehicle_controller.dart';
 import 'package:nobile/Views/MyVehicle/MyVehicleScreen.dart';
+import 'package:nobile/Views/PersonalInfoScreen.dart';
 
 class AccountScreen extends StatelessWidget {
-  const AccountScreen({super.key});
+  final MyVehicleController vehicleController = Get.put(MyVehicleController());
+
+  AccountScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,17 +41,21 @@ class AccountScreen extends StatelessWidget {
                       _ProfileRow(
                           icon: Icons.person,
                           text: 'My personal info',
-                          onTap: () {}),
+                          onTap: () {
+                            Get.to(() => PersonalInfoScreen());
+                          }),
                       _ProfileRow(
                           icon: Icons.credit_card,
                           text: 'My payment method',
                           onTap: () {}),
-                      _ProfileRow(
+                      Obx(() => _ProfileRow(
                           icon: Icons.directions_car,
-                          text: 'My vehicle',
+                          text: vehicleController.userVehicles.isEmpty
+                              ? 'Add a vehicle'
+                              : 'My vehicles (${vehicleController.userVehicles.length})',
                           onTap: () {
                             Get.to(() => MyVehicleScreen());
-                          }),
+                          })),
                       _ProfileRow(
                           icon: Icons.badge_outlined,
                           text: 'My access badges',

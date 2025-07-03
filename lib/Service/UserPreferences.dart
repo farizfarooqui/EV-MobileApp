@@ -14,7 +14,9 @@ class UserPreferences {
       if (userData['createdAt'] != null)
         'createdAt': userData['createdAt'] is String
             ? userData['createdAt']
-            : userData['createdAt'].toDate().toIso8601String(),
+            : userData['createdAt'] is DateTime
+                ? userData['createdAt'].toIso8601String()
+                : userData['createdAt'].toDate().toIso8601String(),
     };
 
     await prefs.setString(_userKey, jsonEncode(cleanedData));

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nobile/Views/MyVehicle/add_vehicle_screen.dart';
 import '../../Controller/my_vehicle_controller.dart';
+import '../../Constants/Constants.dart';
 
 class SelectModelScreen extends StatelessWidget {
   SelectModelScreen({super.key});
@@ -12,53 +12,113 @@ class SelectModelScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const BackButton(),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: colorPrimary),
+          onPressed: () => Get.back(),
+        ),
         centerTitle: true,
-        title: const Text('SELECT MODEL',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        title: Text(
+          'Select Model',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: colorPrimary,
+            fontSize: 20,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
         elevation: 0,
       ),
       body: Column(
         children: [
           const SizedBox(height: 16),
           Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Search',
-                  prefixIcon: const Icon(Icons.search),
-                  filled: true,
-                  fillColor: Theme.of(context).cardColor,
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search models...',
+                prefixIcon: Icon(Icons.search, color: colorPrimary),
+                filled: true,
+                fillColor: Theme.of(context).cardColor,
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
                 ),
-                onChanged: (value) => searchQuery.value = value,
-              )),
-          const SizedBox(height: 8),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: colorPrimary, width: 2),
+                ),
+              ),
+              onChanged: (value) => searchQuery.value = value,
+            ),
+          ),
+          const SizedBox(height: 16),
           Expanded(
             child: Obx(() {
-              final models = controller.getModelsForSelectedBrand();
+              final models = controller.modelsForSelectedBrand;
               final filteredModels = models
-                  .where((m) =>
-                      m.toLowerCase().contains(searchQuery.value.toLowerCase()))
+                  .where((model) => model.name
+                      .toLowerCase()
+                      .contains(searchQuery.value.toLowerCase()))
                   .toList();
-              return ListView.separated(
+
+              return ListView.builder(
                 itemCount: filteredModels.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
                 itemBuilder: (context, index) {
                   final model = filteredModels[index];
-                  return ListTile(
-                    title: Text(model, style: const TextStyle(fontSize: 17)),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      controller.selectModel(model);
-                      Get.to(() => AddVehicleScreen());
-                    },
+                  return Container(
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 5,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ListTile(
+                      leading: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: colorPrimary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.ev_station,
+                          color: colorPrimary,
+                          size: 20,
+                        ),
+                      ),
+                      title: Text(
+                        model.name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      subtitle: Text(
+                        '${model.category} • ${model.variants.length} variants',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.grey[400],
+                        size: 16,
+                      ),
+                      onTap: () {
+                        controller.selectModel(model);
+                        Get.back();
+                      },
+                    ),
                   );
                 },
               );

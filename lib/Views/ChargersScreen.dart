@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Controller/main_nav_controller.dart';
+import 'package:nobile/Controller/my_vehicle_controller.dart';
+import 'package:nobile/Views/MyVehicle/add_vehicle_screen.dart';
 
 class ChargersScreen extends StatelessWidget {
   final MainNavController navController = Get.put(MainNavController());
+  final MyVehicleController vehicleController = Get.put(MyVehicleController());
 
   ChargersScreen({super.key});
 
@@ -56,14 +59,27 @@ class ChargersScreen extends StatelessWidget {
                             ),
                       ),
                       const SizedBox(height: 18),
-                      _GettingStartedRow(
-                        icon: Icons.directions_car,
-                        title: 'Add a vehicle',
-                        subtitle:
-                            'Benefit from features compatible with your vehicle (Autocharge, reservation, etc...)',
-                        onTap: () {},
-                        showDot: true,
-                      ),
+                      Obx(() => vehicleController.userVehicles.isEmpty
+                          ? _GettingStartedRow(
+                              icon: Icons.directions_car,
+                              title: 'Add a vehicle',
+                              subtitle:
+                                  'Benefit from features compatible with your vehicle (Autocharge, reservation, etc...)',
+                              onTap: () {
+                                Get.to(() => AddVehicleScreen());
+                              },
+                              showDot: true,
+                            )
+                          : _GettingStartedRow(
+                              icon: Icons.directions_car,
+                              title: 'My vehicles (${vehicleController.userVehicles.length})',
+                              subtitle:
+                                  'Manage your vehicles and view charging history',
+                              onTap: () {
+                                Get.to(() => AddVehicleScreen());
+                              },
+                              showDot: false,
+                            )),
                       const SizedBox(height: 12),
                       _GettingStartedRow(
                         icon: Icons.credit_card,
