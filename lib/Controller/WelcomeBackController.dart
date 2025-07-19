@@ -74,6 +74,7 @@ class WelcomeScreenController extends GetxController {
         }
         await UserPreferences.setLogin(true);
         final userData = userDoc.data() as Map<String, dynamic>;
+        await UserPreferences.saveUser(userData);
         Get.offAll(() => MainNavBar(), transition: Transition.fade, arguments: {
           'userData': userData,
         });
@@ -244,6 +245,7 @@ class WelcomeScreenController extends GetxController {
           .set(userData);
 
       await UserPreferences.saveUser(userData);
+      print("User data successfully saved");
       await UserPreferences.setLogin(true);
       Get.offAll(() => MainNavBar(),
           transition: Transition.rightToLeft,

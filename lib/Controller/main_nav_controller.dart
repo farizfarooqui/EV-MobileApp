@@ -1,18 +1,24 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nobile/Service/UserPreferences.dart';
 
 class MainNavController extends GetxController {
   RxInt tabIndex = 2.obs;
   late PageController pageController;
-  final Map<String, dynamic> userData = Get.arguments['userData'];
+
+  var userData = <String, dynamic>{}.obs;
 
   @override
   void onInit() {
     super.onInit();
     pageController = PageController(initialPage: tabIndex.value);
-    var userData = Get.arguments['userData'];
+    getUserData();
+  }
+
+  Future<void> getUserData() async {
+    final data = await UserPreferences.getUser();
+    userData.value = data ?? {};
     log("User Name: ${userData['name']}");
   }
 

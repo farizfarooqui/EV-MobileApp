@@ -10,9 +10,7 @@ import 'package:nobile/Controller/main_nav_controller.dart';
 import 'package:nobile/Views/SettingsScreen.dart';
 
 class MainNavBar extends StatelessWidget {
-  final Map<String, dynamic>? userData;
-
-  MainNavBar({super.key, this.userData});
+  MainNavBar({super.key});
   final MainNavController navController = Get.put(MainNavController());
 
   final List<Widget> _screens = [
