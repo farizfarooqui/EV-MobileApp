@@ -384,7 +384,12 @@ class StationDetailSheet extends StatelessWidget {
                                 color: colorPrimary,
                               ),
                             ),
-                            const Icon(Icons.arrow_forward_ios_outlined)
+                            const Spacer(),
+                            const Icon(
+                              Icons.arrow_forward_ios_outlined,
+                              size: 20,
+                              color: colorGrey,
+                            )
                           ],
                         ),
                       ),
@@ -412,6 +417,12 @@ class StationDetailSheet extends StatelessWidget {
                                 MaterialTapTargetSize.shrinkWrap,
                             visualDensity: const VisualDensity(
                                 horizontal: 0, vertical: -4),
+                            shape: RoundedRectangleBorder(
+                                side: const BorderSide(
+                                  color: Colors.transparent,
+                                  width: 1.5,
+                                ),
+                                borderRadius: BorderRadius.circular(8)),
                           ),
                           const SizedBox(width: 8),
                           const Text('24/7'),
@@ -498,9 +509,15 @@ class StationDetailSheet extends StatelessWidget {
                 runSpacing: 8,
                 children: station.amenities
                     .map((amenity) => Chip(
+                          shape: RoundedRectangleBorder(
+                              side: const BorderSide(
+                                color: colorPrimary,
+                                width: 1,
+                              ),
+                              borderRadius: BorderRadius.circular(8)),
                           label: Text(amenity),
                           backgroundColor: colorPrimary.withOpacity(0.1),
-                          labelStyle: TextStyle(color: colorPrimary),
+                          labelStyle: const TextStyle(color: colorPrimary),
                         ))
                     .toList(),
               ),
@@ -628,6 +645,12 @@ class StationDetailSheet extends StatelessWidget {
 
   Widget _statusChip(String label, int count, Color color) {
     return Chip(
+      shape: RoundedRectangleBorder(
+          side: const BorderSide(
+            color: Colors.transparent,
+            width: 1.5,
+          ),
+          borderRadius: BorderRadius.circular(8)),
       backgroundColor: color.withOpacity(0.1),
       label: Row(
         mainAxisSize: MainAxisSize.min,
