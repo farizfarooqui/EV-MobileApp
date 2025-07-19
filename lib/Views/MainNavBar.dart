@@ -10,7 +10,9 @@ import 'package:nobile/Controller/main_nav_controller.dart';
 import 'package:nobile/Views/SettingsScreen.dart';
 
 class MainNavBar extends StatelessWidget {
-  MainNavBar({super.key});
+  final Map<String, dynamic>? userData;
+
+  MainNavBar({super.key, this.userData});
   final MainNavController navController = Get.put(MainNavController());
 
   final List<Widget> _screens = [
@@ -56,10 +58,11 @@ class MainNavBar extends StatelessWidget {
           ],
           color: Theme.of(context).brightness == Brightness.dark
               ? Colors.black
-              : colorNavBar,
+              : Colors.white,
           height: 60,
           circleWidth: 60,
-          // shadowColor: Colors.grey,
+          shadowColor: Colors.black.withOpacity(0.1),
+          circleShadowColor: Colors.black.withOpacity(0.1),
           activeIndex: navController.tabIndex.value,
           onTap: navController.changeTab,
           padding: const EdgeInsets.only(left: 16, right: 16, bottom: 20),

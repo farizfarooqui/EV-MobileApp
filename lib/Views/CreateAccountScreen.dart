@@ -85,7 +85,7 @@ class CreateAccountScreen extends StatelessWidget {
                       const SizedBox(height: 32),
                       AppTextField(
                         controller: controller.nameController,
-                        hintName: 'Full Name',
+                        hintName: 'Name',
                         prefixIcon: Padding(
                           padding: const EdgeInsets.all(15.0),
                           child: SvgPicture.asset(
@@ -126,6 +126,7 @@ class CreateAccountScreen extends StatelessWidget {
                               color: Colors.white54,
                             ),
                           ),
+                          isSuffix: true,
                           suffixIcon: GestureDetector(
                             onTap: controller.togglePasswordVisibility,
                             child: Padding(

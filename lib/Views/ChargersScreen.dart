@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Controller/main_nav_controller.dart';
 import 'package:nobile/Controller/my_vehicle_controller.dart';
-import 'package:nobile/Views/MyVehicle/add_vehicle_screen.dart';
+import 'package:nobile/Views/MyVehicle/AddVehicleScreen.dart';
 
 class ChargersScreen extends StatelessWidget {
   final MainNavController navController = Get.put(MainNavController());
@@ -13,7 +13,7 @@ class ChargersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Colors.black.withOpacity(0.04),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -38,7 +38,7 @@ class ChargersScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(20),
                   margin: const EdgeInsets.only(bottom: 20),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
@@ -72,7 +72,8 @@ class ChargersScreen extends StatelessWidget {
                             )
                           : _GettingStartedRow(
                               icon: Icons.directions_car,
-                              title: 'My vehicles (${vehicleController.userVehicles.length})',
+                              title:
+                                  'My vehicles (${vehicleController.userVehicles.length})',
                               subtitle:
                                   'Manage your vehicles and view charging history',
                               onTap: () {
@@ -98,7 +99,7 @@ class ChargersScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(20),
                   margin: const EdgeInsets.only(bottom: 20),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
@@ -143,18 +144,20 @@ class ChargersScreen extends StatelessWidget {
                         .textTheme
                         .titleSmall
                         ?.copyWith(fontWeight: FontWeight.bold)),
-                Card(
-                  color: Theme.of(context).cardColor,
-                  elevation: 0,
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
-                  child: ListTile(
-                    leading: Icon(Icons.flash_on,
-                        color: Theme.of(context).colorScheme.primary),
-                    title: const Text('Sessions & reservations'),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () {},
+                GestureDetector(
+                  onTap: () {},
+                  child: Card(
+                    color: Colors.white,
+                    elevation: 0,
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    child: ListTile(
+                      leading: Icon(Icons.flash_on,
+                          color: Theme.of(context).colorScheme.primary),
+                      title: const Text('Sessions & reservations'),
+                      trailing: const Icon(Icons.chevron_right),
+                    ),
                   ),
                 ),
 

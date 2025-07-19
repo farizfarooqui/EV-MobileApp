@@ -72,7 +72,7 @@ class WelcomeScreenController extends GetxController {
         if (!userDoc.exists) {
           throw Exception("User document does not exist.");
         }
-
+        await UserPreferences.setLogin(true);
         final userData = userDoc.data() as Map<String, dynamic>;
         Get.offAll(() => MainNavBar(), transition: Transition.fade, arguments: {
           'userData': userData,
@@ -244,8 +244,7 @@ class WelcomeScreenController extends GetxController {
           .set(userData);
 
       await UserPreferences.saveUser(userData);
-
-      // Navigate to home screen
+      await UserPreferences.setLogin(true);
       Get.offAll(() => MainNavBar(),
           transition: Transition.rightToLeft,
           arguments: {

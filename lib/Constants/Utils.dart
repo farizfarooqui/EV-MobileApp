@@ -12,7 +12,7 @@ class Utils {
     Get.showSnackbar(GetSnackBar(
       title: title,
       message: message,
-      backgroundColor: Color.lerp(colorNavBar, colorBlack, 0.006)!,
+      backgroundColor: Color.lerp(colorPrimary, Colors.white, 0.006)!,
       snackPosition: SnackPosition.TOP,
       duration: const Duration(seconds: 3),
       snackStyle: SnackStyle.GROUNDED,

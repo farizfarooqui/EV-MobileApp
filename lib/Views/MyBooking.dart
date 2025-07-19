@@ -31,9 +31,9 @@ class MyBookingScreen extends StatelessWidget {
         booking.endTime.isAfter(now);
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      elevation: 4,
+      elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      color: colorScheme.surface,
+      color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -61,7 +61,7 @@ class MyBookingScreen extends StatelessWidget {
                         style: textTheme.titleLarge?.copyWith(
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
-                          fontSize: 20,
+                          fontSize: 18,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -89,15 +89,21 @@ class MyBookingScreen extends StatelessWidget {
                 ),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                   decoration: BoxDecoration(
-                    color: booking.status.toLowerCase() == 'active'
-                        ? Colors.green
-                        : booking.status.toLowerCase() == 'canceled'
-                            ? Colors.red
-                            : Colors.orange,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                      color: booking.status.toLowerCase() == 'active'
+                          ? Colors.green.withOpacity(0.1)
+                          : booking.status.toLowerCase() == 'canceled'
+                              ? Colors.red.withOpacity(0.1)
+                              : Colors.orange.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: booking.status.toLowerCase() == 'active'
+                            ? Colors.green
+                            : booking.status.toLowerCase() == 'canceled'
+                                ? Colors.red
+                                : Colors.orange,
+                      )),
                   child: Row(
                     children: [
                       Icon(
@@ -106,14 +112,22 @@ class MyBookingScreen extends StatelessWidget {
                             : booking.status.toLowerCase() == 'canceled'
                                 ? Icons.cancel
                                 : Icons.hourglass_bottom,
-                        color: Colors.white,
-                        size: 16,
+                        color: booking.status.toLowerCase() == 'active'
+                            ? Colors.green
+                            : booking.status.toLowerCase() == 'canceled'
+                                ? Colors.red
+                                : Colors.orange,
+                        size: 14,
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        booking.status.toUpperCase(),
-                        style: const TextStyle(
-                            color: Colors.white,
+                        booking.status,
+                        style: TextStyle(
+                            color: booking.status.toLowerCase() == 'active'
+                                ? Colors.green
+                                : booking.status.toLowerCase() == 'canceled'
+                                    ? Colors.red
+                                    : Colors.orange,
                             fontSize: 12,
                             fontWeight: FontWeight.bold),
                       ),
@@ -176,12 +190,12 @@ class MyBookingScreen extends StatelessWidget {
                               backgroundColor: colorScheme.surface,
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20)),
-                              title: Row(
+                              title: const Row(
                                 children: [
                                   Icon(Icons.cancel,
                                       color: Colors.red, size: 32),
-                                  const SizedBox(width: 8),
-                                  const Text('Cancel Booking',
+                                  SizedBox(width: 8),
+                                  Text('Cancel Booking',
                                       style: TextStyle(fontSize: 18)),
                                 ],
                               ),
@@ -282,11 +296,14 @@ class MyBookingScreen extends StatelessWidget {
         await bookingController.fetchUserBookings();
         controller.refreshCompleted();
       },
-      child: ListView.builder(
-        itemCount: bookings.length,
-        itemBuilder: (context, index) {
-          return _buildBookingCard(bookings[index], isActive, controller);
-        },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 24),
+        child: ListView.builder(
+          itemCount: bookings.length,
+          itemBuilder: (context, index) {
+            return _buildBookingCard(bookings[index], isActive, controller);
+          },
+        ),
       ),
     );
   }
@@ -298,7 +315,7 @@ class MyBookingScreen extends StatelessWidget {
         children: [
           Icon(Icons.inbox,
               size: 80, color: Theme.of(context).hintColor.withOpacity(0.3)),
-          const SizedBox(height: 24),
+          const SizedBox(height: 10),
           Text(
             message,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -309,7 +326,7 @@ class MyBookingScreen extends StatelessWidget {
                       ?.withOpacity(0.8),
                 ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 10),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
@@ -333,7 +350,7 @@ class MyBookingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Colors.black.withOpacity(0.04),
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
@@ -349,6 +366,7 @@ class MyBookingScreen extends StatelessWidget {
           preferredSize: const Size.fromHeight(48),
           child: GetBuilder<BookingController>(
             builder: (controller) => TabBar(
+              dividerColor: Colors.transparent,
               controller: controller.tabController,
               indicatorColor: Theme.of(context).colorScheme.primary,
               labelColor: Theme.of(context).colorScheme.primary,

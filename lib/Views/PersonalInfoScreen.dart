@@ -4,8 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
 import 'package:nobile/Controller/PersonalInfoController.dart';
-import 'package:nobile/Views/Widgets/AppTextField.dart';
 import 'package:nobile/Views/Widgets/GradientLoaderButton.dart';
+import 'package:nobile/Views/Widgets/SmallLoader.dart';
 
 class PersonalInfoScreen extends StatelessWidget {
   final PersonalInfoController controller = Get.put(PersonalInfoController());
@@ -16,6 +16,7 @@ class PersonalInfoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      // backgroundColor: Colors.black.withOpacity(0.04),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -35,7 +36,7 @@ class PersonalInfoScreen extends StatelessWidget {
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(
-            child: CircularProgressIndicator(color: colorPrimary),
+            child: SmallLoader(color: colorPrimary),
           );
         }
 
@@ -114,17 +115,18 @@ class PersonalInfoScreen extends StatelessWidget {
               GestureDetector(
                 onTap: controller.showImagePickerDialog,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: colorPrimary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: colorPrimary.withOpacity(0.3)),
                   ),
-                  child: Row(
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.camera_alt, size: 16, color: colorPrimary),
-                      const SizedBox(width: 6),
+                      SizedBox(width: 6),
                       Text(
                         'Change',
                         style: TextStyle(
@@ -139,21 +141,24 @@ class PersonalInfoScreen extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               // Remove Photo Button
-              Obx(() => controller.profileImageUrl.value.isNotEmpty || controller.profileImage.value != null
+              Obx(() => controller.profileImageUrl.value.isNotEmpty ||
+                      controller.profileImage.value != null
                   ? GestureDetector(
                       onTap: controller.removeProfilePicture,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.red.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.red.withOpacity(0.3)),
+                          border:
+                              Border.all(color: Colors.red.withOpacity(0.3)),
                         ),
-                        child: Row(
+                        child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.delete, size: 16, color: Colors.red),
-                            const SizedBox(width: 6),
+                            SizedBox(width: 6),
                             Text(
                               'Remove',
                               style: TextStyle(
@@ -189,7 +194,7 @@ class PersonalInfoScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -211,7 +216,7 @@ class PersonalInfoScreen extends StatelessWidget {
                   color: colorPrimary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(Icons.person, color: colorPrimary, size: 24),
+                child: const Icon(Icons.person, color: colorPrimary, size: 24),
               ),
               const SizedBox(width: 12),
               const Text(
@@ -314,7 +319,25 @@ class PersonalInfoScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              border: InputBorder.none,
+              // border: InputBorder.none,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: Colors.grey.withOpacity(0.4),
+                  width: 0.5,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                    // color: readOnly ? constant.colorSecondary : Colors.white,
+                    color: Colors.grey.withOpacity(0.4),
+                    width: 1.0),
+              ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 16,

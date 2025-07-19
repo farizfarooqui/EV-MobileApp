@@ -5,17 +5,17 @@ import 'package:nobile/Controller/LogoutController.dart';
 import 'package:nobile/Views/Widgets/CustomElevatedButton.dart';
 
 class LogoutScreen extends StatelessWidget {
-  const LogoutScreen({super.key});
+  LogoutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     return Scaffold(
+      // backgroundColor: Colors.black.withOpacity(0.04),
       appBar: AppBar(
         title: const Text("Logout"),
         centerTitle: true,
-        backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: Colors.white,
         elevation: 0,
       ),
       body: Padding(
@@ -23,24 +23,18 @@ class LogoutScreen extends StatelessWidget {
         child: Column(
           children: [
             const Spacer(),
-            Icon(
-              Icons.logout_rounded,
-              size: 80,
-              color: theme.colorScheme.primary.withOpacity(0.8),
-            ),
+            Icon(Icons.logout_rounded, size: 80, color: colorPrimary),
             const SizedBox(height: 20),
             Text(
               "Are you sure you want to log out?",
               textAlign: TextAlign.center,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             Text(
               "You will be signed out of your account.",
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
+              style: TextStyle(
                 color: theme.hintColor,
               ),
             ),
@@ -102,6 +96,7 @@ class LogoutScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: CustomElevatedButton(
+                        radious: 14.0,
                         text: "Cancel",
                         backgroundColor: Colors.grey[300]!,
                         textColor: Colors.black,
@@ -112,6 +107,7 @@ class LogoutScreen extends StatelessWidget {
                     Expanded(
                       child: Obx(
                         () => CustomElevatedButton(
+                          radious: 14.0,
                           text: "Yes, Logout",
                           loading: controller.deleteBtnLoading.value,
                           backgroundColor: Colors.red,

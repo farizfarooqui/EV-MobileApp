@@ -3,12 +3,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UserPreferences {
   static const String _userKey = 'user_data';
+  static const String _isLoginKey = 'islogin';
 
   /// Save user data to SharedPreferences
   static Future<void> saveUser(Map<String, dynamic> userData) async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Convert any Timestamp/DateTime to String
+    // Convert Timestamp/DateTime to String
     final cleanedData = {
       ...userData,
       if (userData['createdAt'] != null)
@@ -37,9 +38,22 @@ class UserPreferences {
     return decoded;
   }
 
-  /// Remove user data on logout
+  /// Check if user is logged in
+  static Future<bool> isLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_isLoginKey) ?? false;
+  }
+
+  /// Set login status manually
+  static Future<void> setLogin(bool isLogin) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_isLoginKey, isLogin);
+  }
+
+  /// Clear everything on logout
   static Future<void> clearUser() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_userKey);
+    await prefs.setBool(_isLoginKey, false);
   }
 }

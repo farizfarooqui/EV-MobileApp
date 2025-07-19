@@ -11,9 +11,8 @@ class AccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Colors.black.withOpacity(0.04),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -21,18 +20,15 @@ class AccountScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 12),
-
-                // Profile Section
                 const SizedBox(height: 8),
-                Text('PROFIL',
+                Text('PROFILE',
                     style: Theme.of(context)
                         .textTheme
                         .titleSmall
                         ?.copyWith(fontWeight: FontWeight.bold)),
                 Card(
-                  color: Theme.of(context).cardColor,
-                  elevation: 0,
+                  color: Colors.white,
+                  elevation: 2,
                   margin: const EdgeInsets.symmetric(vertical: 8),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16)),

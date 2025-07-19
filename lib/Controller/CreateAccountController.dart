@@ -35,7 +35,8 @@ class CreateAccountController extends GetxController {
     if (nameController.text.isEmpty) {
       Utils.showError('Missing Name', 'Please enter your name.');
       return;
-    } else if (emailController.text.isEmpty && passwordController.text.isEmpty) {
+    } else if (emailController.text.isEmpty &&
+        passwordController.text.isEmpty) {
       Utils.showError("Ah Snap!", "Please provide credentials");
     } else if (emailController.text.isEmpty) {
       Utils.showError('Missing Email', 'Please enter your email address.');
@@ -53,7 +54,7 @@ class CreateAccountController extends GetxController {
 
   Future<void> signUpWithEmailAndPassword() async {
     log("[signUpWithEmailAndPassword] : ");
-    log("Name : "+nameController.text);
+    log("Name : " + nameController.text);
     log("Email : ${emailController.text}");
     log("Password : ${passwordController.text}");
     try {
@@ -109,8 +110,7 @@ class CreateAccountController extends GetxController {
           .set(userData);
 
       await UserPreferences.saveUser(userData);
-
-      // Navigate to home screen
+      await UserPreferences.setLogin(true);
       Get.offAll(() => MainNavBar(),
           transition: Transition.rightToLeft,
           arguments: {

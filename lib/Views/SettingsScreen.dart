@@ -11,6 +11,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black.withOpacity(0.04),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -24,8 +25,8 @@ class SettingsScreen extends StatelessWidget {
                       .titleSmall
                       ?.copyWith(fontWeight: FontWeight.bold)),
               Card(
-                color: Theme.of(context).cardColor,
-                elevation: 0,
+                color: Colors.white,
+                elevation: 1,
                 margin: const EdgeInsets.symmetric(vertical: 8),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16)),
@@ -43,7 +44,7 @@ class SettingsScreen extends StatelessWidget {
                         icon: Icons.logout,
                         text: 'Log out',
                         onTap: () {
-                          Get.to(const LogoutScreen());
+                          Get.to(() => LogoutScreen());
                         }),
                   ],
                 ),
@@ -55,8 +56,8 @@ class SettingsScreen extends StatelessWidget {
                       .titleSmall
                       ?.copyWith(fontWeight: FontWeight.bold)),
               Card(
-                color: Theme.of(context).cardColor,
-                elevation: 0,
+                color: Colors.white,
+                elevation: 1,
                 margin: const EdgeInsets.symmetric(vertical: 8),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16)),

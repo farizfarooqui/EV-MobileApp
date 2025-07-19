@@ -30,7 +30,6 @@ class LogoutController extends GetxController {
 
       // Delete controllers before navigation
       logoutBtnLoading.value = false;
-
       Get.delete<StationController>();
       Get.delete<MainNavBar>();
       Get.offAll(() => WelcomeBackScreen());

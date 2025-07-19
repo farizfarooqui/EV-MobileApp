@@ -21,7 +21,7 @@ class GradientLoaderButton extends StatelessWidget {
       width: double.infinity,
       height: 50,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         gradient: const LinearGradient(
           colors: [Colors.green, Color.fromARGB(255, 3, 114, 21)],
           begin: Alignment.centerLeft,

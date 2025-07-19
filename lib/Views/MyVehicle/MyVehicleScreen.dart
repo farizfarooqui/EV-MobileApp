@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nobile/Constants/Constants.dart';
-import 'package:nobile/Views/MyVehicle/add_vehicle_screen.dart';
+import 'package:nobile/Views/MyVehicle/AddVehicleScreen.dart';
 import '../../Controller/my_vehicle_controller.dart';
 import '../../Model/VehicleModel.dart';
 
 class MyVehicleScreen extends StatelessWidget {
-  MyVehicleScreen({Key? key}) : super(key: key);
+  MyVehicleScreen({super.key});
   final MyVehicleController controller = Get.put(MyVehicleController());
 
   @override

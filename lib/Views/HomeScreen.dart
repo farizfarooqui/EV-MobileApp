@@ -9,6 +9,7 @@ import 'package:nobile/Controller/StationController.dart';
 import 'package:nobile/Model/StationModel.dart';
 import 'package:nobile/Views/StationDetailsScreen.dart';
 import 'package:nobile/Views/StationFilterSheet.dart';
+import 'package:nobile/Views/Widgets/CustomMarker.dart';
 import 'package:nobile/Views/Widgets/SmallLoader.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -31,7 +32,7 @@ class HomeScreen extends StatelessWidget {
                       : () {
                           controller.getCurrentLocation();
                         },
-                  backgroundColor: colorNavBar,
+                  backgroundColor: Colors.white,
                   child: controller.isLocating.value
                       ? const SizedBox(
                           width: 20,
@@ -62,7 +63,7 @@ class HomeScreen extends StatelessWidget {
                   builder: (context) => StationFilterSheet(),
                 );
               },
-              backgroundColor: colorNavBar,
+              backgroundColor: Colors.white,
               child: const Icon(
                 Icons.filter_list,
                 color: colorPrimary,
@@ -149,9 +150,9 @@ class HomeScreen extends StatelessWidget {
                                 .withOpacity(0.8),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.ev_station,
-                            color: Theme.of(context).colorScheme.onPrimary,
+                            color: Colors.white,
                             size: 20,
                           ),
                         ),
@@ -170,14 +171,13 @@ class HomeScreen extends StatelessWidget {
             child: Obx(() => controller.showSearch.value
                 ? Container(
                     decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color:
-                              Theme.of(context).shadowColor.withOpacity(0.15),
+                          color: Colors.black.withOpacity(0.1),
                           blurRadius: 8,
-                          offset: const Offset(0, 2),
+                          offset: const Offset(2, 2),
                         ),
                       ],
                     ),
@@ -187,10 +187,14 @@ class HomeScreen extends StatelessWidget {
                           child: TextField(
                             controller: controller.searchController,
                             autofocus: true,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
+                              fillColor: Colors.white,
                               hintText: 'Search stations...',
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 14,
                               ),
@@ -201,7 +205,10 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.close),
+                          icon: const Icon(
+                            Icons.close,
+                            size: 20,
+                          ),
                           onPressed: () {
                             controller.searchController.clear();
                             controller.showSearch.value = false;
@@ -217,7 +224,7 @@ class HomeScreen extends StatelessWidget {
                       Material(
                         color: Colors.transparent,
                         shape: const CircleBorder(),
-                        elevation: 6,
+                        elevation: 2,
                         child: InkWell(
                           customBorder: const CircleBorder(),
                           onTap: () {
@@ -229,22 +236,20 @@ class HomeScreen extends StatelessWidget {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
+                              color: Colors.white,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Theme.of(context)
-                                      .shadowColor
-                                      .withOpacity(0.15),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
+                                  color: Colors.white.withOpacity(0.1),
+                                  blurRadius: 2,
+                                  offset: const Offset(2, 2),
                                 ),
                               ],
                               border: Border.all(
                                 color: Theme.of(context)
                                     .dividerColor
                                     .withOpacity(0.15),
-                                width: 1.5,
+                                width: 0.5,
                               ),
                             ),
                             child: Icon(Icons.search,
@@ -266,7 +271,7 @@ class HomeScreen extends StatelessWidget {
                       maxHeight: MediaQuery.of(context).size.height * 0.6,
                     ),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(

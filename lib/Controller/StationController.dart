@@ -302,6 +302,7 @@ class StationController extends GetxController {
   void onInit() {
     super.onInit();
     getStationsStream();
+    getCurrentLocation();
     mapController = MapController();
   }
 

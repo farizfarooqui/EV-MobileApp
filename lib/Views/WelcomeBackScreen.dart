@@ -96,6 +96,7 @@ class WelcomeBackScreen extends StatelessWidget {
                           padding: const EdgeInsets.all(15.0),
                           child: SvgPicture.asset(
                             "assets/SVG/email.svg",
+                            height: 22,
                             color: Colors.white54,
                           ),
                         ),
@@ -113,7 +114,7 @@ class WelcomeBackScreen extends StatelessWidget {
                             child: SvgPicture.asset(
                               "assets/SVG/password.svg",
                               color: Colors.white54,
-                              width: 22,
+                              height: 20,
                             ),
                           ),
                           isSuffix: true,
@@ -163,17 +164,21 @@ class WelcomeBackScreen extends StatelessWidget {
                           )),
 
                       const SizedBox(height: 24),
-                      const Row(
+                      Row(
                         children: [
-                          Expanded(child: Divider(color: Colors.white24)),
-                          Padding(
+                          Expanded(
+                              child: Divider(
+                                  color: Colors.white.withOpacity(0.15))),
+                          const Padding(
                             padding: EdgeInsets.symmetric(horizontal: 10),
                             child: Text("Or login with",
                                 style: TextStyle(
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w300,
                                     color: Colors.white38)),
                           ),
-                          Expanded(child: Divider(color: Colors.white24)),
+                          Expanded(
+                              child: Divider(
+                                  color: Colors.white.withOpacity(0.15))),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -187,7 +192,7 @@ class WelcomeBackScreen extends StatelessWidget {
                                   height: 48,
                                   margin: const EdgeInsets.only(right: 8),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF23203B),
+                                    color: Colors.grey.withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: InkWell(
@@ -232,7 +237,7 @@ class WelcomeBackScreen extends StatelessWidget {
                                   height: 48,
                                   margin: const EdgeInsets.only(left: 8),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF23203B),
+                                    color: Colors.grey.withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: InkWell(
