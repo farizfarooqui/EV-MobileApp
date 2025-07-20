@@ -11,8 +11,12 @@ class AddVehicleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme =
+        Get.context != null ? Theme.of(Get.context!) : ThemeData.dark();
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: theme.brightness == Brightness.dark
+          ? const Color(0xFF121212)
+          : Colors.white,
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: colorPrimary),
@@ -177,11 +181,15 @@ class AddVehicleScreen extends StatelessWidget {
   }
 
   Widget _buildBrandCard(VehicleBrand brand, context) {
+    final theme =
+        Get.context != null ? Theme.of(Get.context!) : ThemeData.dark();
     return GestureDetector(
       onTap: () => controller.selectBrand(brand),
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: theme.brightness == Brightness.dark
+              ? const Color(0xFF1E1E1E)
+              : Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -268,13 +276,17 @@ class AddVehicleScreen extends StatelessWidget {
   }
 
   Widget _buildModelCard(VehicleModel model, context) {
+    final theme =
+        Get.context != null ? Theme.of(Get.context!) : ThemeData.dark();
     return GestureDetector(
       onTap: () => controller.selectModel(model),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: theme.brightness == Brightness.dark
+              ? const Color(0xFF1E1E1E)
+              : Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -380,13 +392,18 @@ class AddVehicleScreen extends StatelessWidget {
   }
 
   Widget _buildVariantCard(VehicleVariant variant, context) {
+    final theme =
+        Get.context != null ? Theme.of(Get.context!) : ThemeData.dark();
+
     return GestureDetector(
       onTap: () => controller.selectVariant(variant),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
+          color: theme.brightness == Brightness.dark
+              ? const Color(0xFF1E1E1E)
+              : Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -470,7 +487,7 @@ class AddVehicleScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Vehicle Details',
             style: TextStyle(
               fontSize: 24,

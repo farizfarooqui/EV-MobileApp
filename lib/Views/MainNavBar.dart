@@ -55,7 +55,7 @@ class MainNavBar extends StatelessWidget {
                 color: Theme.of(context).hintColor.withOpacity(0.3)),
           ],
           color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.black
+              ? const Color(0xFF1F1F1F)
               : Colors.white,
           height: 60,
           circleWidth: 60,

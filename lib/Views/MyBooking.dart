@@ -33,7 +33,9 @@ class MyBookingScreen extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      color: Colors.white,
+      color: theme.brightness == Brightness.dark
+          ? const Color(0xFF1E1E1E)
+          : Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -187,34 +189,52 @@ class MyBookingScreen extends StatelessWidget {
                         onTap: () async {
                           final confirmed = await Get.dialog<bool>(
                             AlertDialog(
-                              backgroundColor: colorScheme.surface,
+                              backgroundColor: theme.brightness ==
+                                      Brightness.dark
+                                  ? const Color(
+                                      0xFF1E1E1E) // Dark mode dialog background
+                                  : const Color(
+                                      0xFFFFFFFF), // Light mode dialog background
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20)),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
                               title: const Row(
                                 children: [
-                                  Icon(Icons.cancel,
-                                      color: Colors.red, size: 32),
-                                  SizedBox(width: 8),
-                                  Text('Cancel Booking',
-                                      style: TextStyle(fontSize: 18)),
+                                  Text(
+                                    'Cancel Booking',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Color(
+                                          0xFFEEEEEE), // Light grey text (customizable)
+                                    ),
+                                  ),
                                 ],
                               ),
                               content: Text(
                                 'Are you sure you want to cancel this booking?\nThis action cannot be undone.',
-                                style: textTheme.bodyMedium,
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color: theme.brightness == Brightness.dark
+                                      ? const Color(0xFFCCCCCC)
+                                      : const Color(0xFF444444),
+                                ),
                               ),
                               actions: [
                                 TextButton(
                                   onPressed: () => Get.back(result: false),
-                                  child: const Text('No'),
+                                  child: const Text(
+                                    'No',
+                                    style: TextStyle(
+                                        color: Color(0xFF9E9E9E)), // Grey
+                                  ),
                                 ),
                                 ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
+                                    backgroundColor: const Color(0xFFEF5350)
+                                        .withOpacity(0.3), // Light red
                                     foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
                                   ),
                                   onPressed: () => Get.back(result: true),
                                   child: const Text('Yes, Cancel'),
@@ -222,18 +242,21 @@ class MyBookingScreen extends StatelessWidget {
                               ],
                             ),
                           );
+
                           if (confirmed == true) {
                             final success =
                                 await bookingController.cancelBooking(
-                                    bookingId: booking.id,
-                                    portId: booking.portId,
-                                    slotId: booking.slotId,
-                                    stationId: booking.stationId);
+                              bookingId: booking.id,
+                              portId: booking.portId,
+                              slotId: booking.slotId,
+                              stationId: booking.stationId,
+                            );
                             if (success) {
                               Get.snackbar(
                                 'Booking Canceled',
                                 'Your booking has been canceled.',
-                                backgroundColor: Colors.red,
+                                backgroundColor:
+                                    const Color(0xFFD32F2F), // Deep red
                                 colorText: Colors.white,
                                 snackPosition: SnackPosition.BOTTOM,
                                 margin: const EdgeInsets.all(16),
@@ -257,16 +280,17 @@ class MyBookingScreen extends StatelessWidget {
                             children: [
                               Icon(
                                 Icons.cancel,
-                                color: Colors.red,
+                                color: Color(0xFFD32F2F), // Deep red
                                 size: 16,
                               ),
                               SizedBox(width: 4),
                               Text(
                                 'Cancel',
                                 style: TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold),
+                                  color: Color(0xFFD32F2F), // Deep red
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),
@@ -353,10 +377,17 @@ class MyBookingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme =
+        Get.context != null ? Theme.of(Get.context!) : ThemeData.dark();
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.04),
+      backgroundColor: theme.brightness == Brightness.dark
+          ? const Color(0xFF121212)
+          : Colors.white,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: theme.brightness == Brightness.dark
+            ? const Color(0xFF1F1F1F)
+            // ? Colors.black
+            : Colors.white,
         elevation: 0,
         centerTitle: true,
         title: Text(

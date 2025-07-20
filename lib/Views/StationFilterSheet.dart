@@ -40,10 +40,14 @@ class StationFilterSheet extends StatelessWidget {
       minChildSize: 0.4,
       maxChildSize: 0.9,
       builder: (context, scrollController) {
+        final theme =
+            Get.context != null ? Theme.of(Get.context!) : ThemeData.dark();
         return Obx(
           () => Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
+              color: theme.brightness == Brightness.dark
+                  ? const Color(0xFF1F1F1F)
+                  : Colors.white,
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(20)),
               boxShadow: [
@@ -62,7 +66,9 @@ class StationFilterSheet extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.grey
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -220,6 +226,8 @@ class StationFilterSheet extends StatelessWidget {
     RxList<String> selectedOptions,
     Function(List<String>) onSelectionChanged,
   ) {
+    final theme =
+        Get.context != null ? Theme.of(Get.context!) : ThemeData.dark();
     return Wrap(
       spacing: 8,
       runSpacing: 8,
@@ -237,14 +245,24 @@ class StationFilterSheet extends StatelessWidget {
             }
             onSelectionChanged(newSelection);
           },
-          backgroundColor: Colors.white,
+          backgroundColor: theme.brightness == Brightness.dark
+              ? Colors.grey.shade800
+              : Colors.white,
           selectedColor: colorPrimary.withOpacity(0.2),
           checkmarkColor: colorPrimary,
           labelStyle: TextStyle(
-            color: isSelected ? colorPrimary : Colors.black87,
+            color: isSelected
+                ? colorPrimary
+                : (theme.brightness == Brightness.dark
+                    ? Colors.white70
+                    : Colors.black87),
           ),
           side: BorderSide(
-            color: isSelected ? colorPrimary : Colors.black.withOpacity(0.1),
+            color: isSelected
+                ? colorPrimary
+                : (theme.brightness == Brightness.dark
+                    ? Colors.grey.shade600
+                    : Colors.black.withOpacity(0.1)),
             width: 1.5,
           ),
         );
@@ -253,6 +271,8 @@ class StationFilterSheet extends StatelessWidget {
   }
 
   Widget _buildQuickFilters() {
+    final theme =
+        Get.context != null ? Theme.of(Get.context!) : ThemeData.dark();
     return Column(
       children: [
         Obx(() => SwitchListTile(
@@ -261,9 +281,17 @@ class StationFilterSheet extends StatelessWidget {
               onChanged: (value) => controller.updateOpenOnly(value),
               activeColor: colorPrimary,
               activeTrackColor: colorPrimary.withOpacity(0.4),
-              inactiveThumbColor: Colors.grey.shade400,
-              inactiveTrackColor: Colors.grey.shade300,
-              trackOutlineColor: const WidgetStatePropertyAll(Colors.white),
+              inactiveThumbColor: theme.brightness == Brightness.dark
+                  ? Colors.grey.shade600
+                  : Colors.grey.shade400,
+              inactiveTrackColor: theme.brightness == Brightness.dark
+                  ? Colors.grey.shade800
+                  : Colors.grey.shade300,
+              trackOutlineColor: WidgetStatePropertyAll(
+                theme.brightness == Brightness.dark
+                    ? Colors.transparent
+                    : Colors.white,
+              ),
             )),
         Obx(() => SwitchListTile(
               title: const Text('Available Ports Only'),
@@ -271,9 +299,17 @@ class StationFilterSheet extends StatelessWidget {
               onChanged: (value) => controller.updateAvailableOnly(value),
               activeColor: colorPrimary,
               activeTrackColor: colorPrimary.withOpacity(0.4),
-              inactiveThumbColor: Colors.grey.shade400,
-              inactiveTrackColor: Colors.grey.shade300,
-              trackOutlineColor: const WidgetStatePropertyAll(Colors.white),
+              inactiveThumbColor: theme.brightness == Brightness.dark
+                  ? Colors.grey.shade600
+                  : Colors.grey.shade400,
+              inactiveTrackColor: theme.brightness == Brightness.dark
+                  ? Colors.grey.shade800
+                  : Colors.grey.shade300,
+              trackOutlineColor: WidgetStatePropertyAll(
+                theme.brightness == Brightness.dark
+                    ? Colors.transparent
+                    : Colors.white,
+              ),
             )),
       ],
     );

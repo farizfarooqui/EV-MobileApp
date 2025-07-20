@@ -14,9 +14,12 @@ class PersonalInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme =
+        Get.context != null ? Theme.of(Get.context!) : ThemeData.dark();
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      // backgroundColor: Colors.black.withOpacity(0.04),
+      backgroundColor: theme.brightness == Brightness.dark
+          ? const Color(0xFF121212)
+          : Colors.white, // backgroundColor: Colors.black.withOpacity(0.04),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -191,10 +194,14 @@ class PersonalInfoScreen extends StatelessWidget {
   }
 
   Widget _buildPersonalInfoForm(context) {
+    final theme =
+        Get.context != null ? Theme.of(Get.context!) : ThemeData.dark();
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.brightness == Brightness.dark
+            ? const Color(0xFF1E1E1E)
+            : Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -232,6 +239,7 @@ class PersonalInfoScreen extends StatelessWidget {
 
           // Name Field
           _buildFormField(
+            context: context,
             label: 'Full Name',
             icon: 'assets/SVG/person.svg',
             controller: controller.nameController,
@@ -242,6 +250,8 @@ class PersonalInfoScreen extends StatelessWidget {
 
           // Email Field
           _buildFormField(
+            context: context,
+
             label: 'Email Address',
             icon: 'assets/SVG/email.svg',
             controller: controller.emailController,
@@ -253,6 +263,7 @@ class PersonalInfoScreen extends StatelessWidget {
 
           // Phone Field
           _buildFormField(
+            context: context,
             label: 'Phone Number',
             icon: 'assets/SVG/Phone.svg',
             controller: controller.phoneController,
@@ -271,16 +282,20 @@ class PersonalInfoScreen extends StatelessWidget {
     required String hint,
     required TextInputType keyboardType,
     bool enabled = true,
+    required BuildContext context, // Pass context to access theme
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: colorPrimary,
+            color: colorScheme.primary,
           ),
         ),
         const SizedBox(height: 8),
@@ -289,7 +304,9 @@ class PersonalInfoScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: enabled
-                  ? Colors.grey.withOpacity(0.3)
+                  ? (theme.brightness == Brightness.dark
+                      ? Colors.white24
+                      : Colors.grey.withOpacity(0.3))
                   : Colors.grey.withOpacity(0.1),
             ),
           ),
@@ -298,13 +315,23 @@ class PersonalInfoScreen extends StatelessWidget {
             enabled: enabled,
             keyboardType: keyboardType,
             style: TextStyle(
-              color: enabled ? Colors.black : Colors.grey,
+              color: enabled
+                  ? (theme.brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black)
+                  : Colors.grey,
               fontSize: 16,
             ),
             decoration: InputDecoration(
+              filled: true,
+              fillColor: theme.brightness == Brightness.dark
+                  ? Colors.grey[900] // Dark background inside textfield
+                  : Colors.grey[100], // Light background for light mode
               hintText: hint,
               hintStyle: TextStyle(
-                color: Colors.grey.withOpacity(0.6),
+                color: theme.brightness == Brightness.dark
+                    ? Colors.white54
+                    : Colors.grey.withOpacity(0.6),
                 fontSize: 14,
               ),
               prefixIcon: Padding(
@@ -314,12 +341,13 @@ class PersonalInfoScreen extends StatelessWidget {
                   height: 20,
                   width: 20,
                   colorFilter: ColorFilter.mode(
-                    enabled ? colorPrimary : Colors.grey,
+                    enabled
+                        ? colorScheme.primary
+                        : Colors.grey, // icon color based on state
                     BlendMode.srcIn,
                   ),
                 ),
               ),
-              // border: InputBorder.none,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -327,16 +355,20 @@ class PersonalInfoScreen extends StatelessWidget {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                  color: Colors.grey.withOpacity(0.4),
+                  color: theme.brightness == Brightness.dark
+                      ? Colors.white24
+                      : Colors.grey.withOpacity(0.4),
                   width: 0.5,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
-                    // color: readOnly ? constant.colorSecondary : Colors.white,
-                    color: Colors.grey.withOpacity(0.4),
-                    width: 1.0),
+                  color: theme.brightness == Brightness.dark
+                      ? colorScheme.primary.withOpacity(0.5)
+                      : Colors.grey.withOpacity(0.4),
+                  width: 1.0,
+                ),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,

@@ -11,8 +11,12 @@ class AccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme =
+        Get.context != null ? Theme.of(Get.context!) : ThemeData.dark();
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.04),
+      backgroundColor: theme.brightness == Brightness.dark
+          ? const Color(0xFF121212)
+          : Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -27,7 +31,9 @@ class AccountScreen extends StatelessWidget {
                         .titleSmall
                         ?.copyWith(fontWeight: FontWeight.bold)),
                 Card(
-                  color: Colors.white,
+                  color: theme.brightness == Brightness.dark
+                      ? const Color(0xFF1E1E1E)
+                      : Colors.white,
                   elevation: 2,
                   margin: const EdgeInsets.symmetric(vertical: 8),
                   shape: RoundedRectangleBorder(

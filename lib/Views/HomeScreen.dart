@@ -18,6 +18,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme =
+        Get.context != null ? Theme.of(Get.context!) : ThemeData.dark();
     return Scaffold(
       resizeToAvoidBottomInset: true,
       floatingActionButton: IgnorePointer(
@@ -36,7 +38,9 @@ class HomeScreen extends StatelessWidget {
                           : () {
                               controller.getCurrentLocation();
                             },
-                      backgroundColor: Colors.white,
+                      backgroundColor: theme.brightness == Brightness.dark
+                          ? const Color(0xFF1E1E1E)
+                          : Colors.white,
                       child: controller.isLocating.value
                           ? const SizedBox(
                               width: 20,
@@ -67,7 +71,10 @@ class HomeScreen extends StatelessWidget {
                       builder: (context) => StationFilterSheet(),
                     );
                   },
-                  backgroundColor: Colors.white,
+                  backgroundColor: theme.brightness == Brightness.dark
+                      ? const Color(0xFF1F1F1F)
+                      // ? Colors.black
+                      : Colors.white,
                   child: const Icon(
                     Icons.filter_list,
                     color: colorPrimary,
@@ -177,7 +184,10 @@ class HomeScreen extends StatelessWidget {
             child: Obx(() => controller.showSearch.value
                 ? Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: theme.brightness == Brightness.dark
+                          ? const Color(0xFF1F1F1F)
+                          // ? Colors.black
+                          : Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
@@ -194,7 +204,10 @@ class HomeScreen extends StatelessWidget {
                             controller: controller.searchController,
                             autofocus: true,
                             decoration: InputDecoration(
-                              fillColor: Colors.white,
+                              fillColor: theme.brightness == Brightness.dark
+                                  ? const Color(0xFF1F1F1F)
+                                  // ? Colors.black
+                                  : Colors.white,
                               hintText: 'Search stations...',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -242,24 +255,36 @@ class HomeScreen extends StatelessWidget {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: theme.brightness == Brightness.dark
+                                  ? const Color(0xFF1F1F1F)
+                                  // ? Colors.black
+                                  : Colors.white,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.white.withOpacity(0.1),
+                                  color: theme.brightness == Brightness.dark
+                                      ? const Color(0xFF1F1F1F)
+                                      // ? Colors.black
+                                      : Colors.white.withOpacity(0.1),
                                   blurRadius: 2,
                                   offset: const Offset(2, 2),
                                 ),
                               ],
                               border: Border.all(
-                                color: Theme.of(context)
-                                    .dividerColor
-                                    .withOpacity(0.15),
+                                color: theme.brightness == Brightness.dark
+                                    ? const Color(0xFF1F1F1F)
+                                    : Theme.of(context)
+                                        .dividerColor
+                                        .withOpacity(0.15),
                                 width: 0.5,
                               ),
                             ),
-                            child: Icon(Icons.search,
-                                color: Theme.of(context).iconTheme.color),
+                            child: Icon(
+                              Icons.search,
+                              color: theme.brightness == Brightness.dark
+                                  ? Colors.green
+                                  : Theme.of(context).iconTheme.color,
+                            ),
                           ),
                         ),
                       ),
@@ -277,7 +302,9 @@ class HomeScreen extends StatelessWidget {
                       maxHeight: MediaQuery.of(context).size.height * 0.6,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF1E1E1E) // Dark theme background
+                          : Colors.white, // Light theme background
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
@@ -292,7 +319,10 @@ class HomeScreen extends StatelessWidget {
                         ? const Center(
                             child: Padding(
                               padding: EdgeInsets.all(16.0),
-                              child: Text('No stations found'),
+                              child: Text(
+                                'No stations found',
+                                style: TextStyle(color: Colors.grey),
+                              ),
                             ),
                           )
                         : ListView.builder(
@@ -310,9 +340,14 @@ class HomeScreen extends StatelessWidget {
                                       ? Colors.green
                                       : Colors.red,
                                 ),
-                                title: Text(station.stationName),
-                                subtitle:
-                                    Text('${station.city}, ${station.state}'),
+                                title: Text(
+                                  station.stationName,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                                subtitle: Text(
+                                  '${station.city}, ${station.state}',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
                                 onTap: () {
                                   controller.goToStation(station.toJson());
                                   controller.showSearch.value = false;
@@ -345,266 +380,307 @@ class StationDetailSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      controller: scrollController,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// Drag handle
-            Center(
-              child: Container(
-                width: 40,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Colors.grey[400],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF1C1C1C) : Colors.white;
+    final cardColor = isDark ? const Color(0xFF2A2A2A) : Colors.white;
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subtitleColor = isDark ? Colors.grey[400] : Colors.grey;
+    final dividerColor = isDark ? Colors.grey[700]! : Colors.grey[300]!;
 
-            /// Header
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// Station Info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Get.to(() =>
-                              StationDetailsScreen(stationId: station.id));
-                          log("Station Id : ${station.id}");
-                        },
-                        child: Row(
-                          children: [
-                            Text(
-                              station.stationName,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: colorPrimary,
-                              ),
-                            ),
-                            const Spacer(),
-                            const Icon(
-                              Icons.arrow_forward_ios_outlined,
-                              size: 20,
-                              color: colorGrey,
-                            )
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${station.address}, ${station.city}',
-                        style: const TextStyle(color: Colors.grey),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Chip(
-                            label: Text(
-                              station.verified ? 'VERIFIED' : 'UNVERIFIED',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                              ),
-                            ),
-                            backgroundColor:
-                                station.verified ? Colors.green : Colors.red,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 0),
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            visualDensity: const VisualDensity(
-                                horizontal: 0, vertical: -4),
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(
-                                  color: Colors.transparent,
-                                  width: 1.5,
-                                ),
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text('24/7'),
-                        ],
-                      ),
-                    ],
+    return Container(
+      decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+      child: SingleChildScrollView(
+        controller: scrollController,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// Drag handle
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[400],
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            /// Station Status
-            GetX<StationController>(
-              builder: (controller) {
-                // Find the current station in the controller's stations list
-                final currentStation = controller.stations.firstWhereOrNull(
-                  (s) => s.id == station.id,
-                );
-
-                // If station not found in controller, use the passed station
-                final stationToUse = currentStation ?? station;
-
-                final availablePorts =
-                    stationToUse.ports.where((port) => port.isActive).length;
-                final totalPorts = stationToUse.ports.length;
-                final occupiedPorts = stationToUse.ports
-                    .where((port) => port.slots.any((slot) => slot.isBooked))
-                    .length;
-
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _statusChip("Available", availablePorts, Colors.blue[900]!),
-                    _statusChip("Occupied", occupiedPorts, Colors.amber[700]!),
-                    _statusChip("Total", totalPorts, Colors.grey[700]!),
-                  ],
-                );
-              },
-            ),
-
-            const SizedBox(height: 16),
-            const Divider(),
-
-            /// Charging Ports
-            const Text(
-              'Charging Ports',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
               ),
-            ),
-            const SizedBox(height: 8),
-            GetX<StationController>(
-              builder: (controller) {
-                final currentStation = controller.stations.firstWhereOrNull(
-                  (s) => s.id == station.id,
-                );
-                final stationToUse = currentStation ?? station;
+              const SizedBox(height: 12),
 
-                return Column(
-                  children: stationToUse.ports
-                      .map((port) => _buildPortCard(port))
-                      .toList(),
-                );
-              },
-            ),
+              /// Header
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// Station Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Get.to(() =>
+                                StationDetailsScreen(stationId: station.id));
+                            log("Station Id : ${station.id}");
+                          },
+                          child: Row(
+                            children: [
+                              Text(
+                                station.stationName,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: colorPrimary,
+                                ),
+                              ),
+                              const Spacer(),
+                              Icon(
+                                Icons.arrow_forward_ios_outlined,
+                                size: 20,
+                                color: isDark ? Colors.grey[400] : colorGrey,
+                              )
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${station.address}, ${station.city}',
+                          style: TextStyle(color: subtitleColor),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Chip(
+                              label: Text(
+                                station.verified ? 'VERIFIED' : 'UNVERIFIED',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                ),
+                              ),
+                              backgroundColor:
+                                  station.verified ? Colors.green : Colors.red,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 0),
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                              visualDensity: const VisualDensity(
+                                  horizontal: 0, vertical: -4),
+                              shape: RoundedRectangleBorder(
+                                  side: const BorderSide(
+                                    color: Colors.transparent,
+                                    width: 1.5,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8)),
+                            ),
+                            const SizedBox(width: 8),
+                            Text('24/7', style: TextStyle(color: textColor)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
 
-            const SizedBox(height: 16),
-            const Divider(),
+              /// Station Status
+              GetX<StationController>(
+                builder: (controller) {
+                  final currentStation = controller.stations.firstWhereOrNull(
+                    (s) => s.id == station.id,
+                  );
+                  final stationToUse = currentStation ?? station;
 
-            /// Amenities
-            if (station.amenities.isNotEmpty) ...[
-              const Text(
-                'Amenities',
+                  final availablePorts =
+                      stationToUse.ports.where((port) => port.isActive).length;
+                  final totalPorts = stationToUse.ports.length;
+                  final occupiedPorts = stationToUse.ports
+                      .where((port) => port.slots.any((slot) => slot.isBooked))
+                      .length;
+
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _statusChip(
+                          "Available", availablePorts, Colors.blue[900]!),
+                      _statusChip(
+                          "Occupied", occupiedPorts, Colors.amber[700]!),
+                      _statusChip("Total", totalPorts, Colors.grey[700]!),
+                    ],
+                  );
+                },
+              ),
+
+              const SizedBox(height: 16),
+              Divider(color: dividerColor),
+
+              /// Charging Ports
+              Text(
+                'Charging Ports',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: textColor,
                 ),
               ),
               const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: station.amenities
-                    .map((amenity) => Chip(
-                          shape: RoundedRectangleBorder(
-                              side: const BorderSide(
-                                color: colorPrimary,
+              GetX<StationController>(
+                builder: (controller) {
+                  final currentStation = controller.stations.firstWhereOrNull(
+                    (s) => s.id == station.id,
+                  );
+                  final stationToUse = currentStation ?? station;
+
+                  return Column(
+                    children: stationToUse.ports
+                        .map((port) => _buildPortCard(context, port))
+                        .toList(),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 16),
+              Divider(color: dividerColor),
+
+              /// Amenities
+              if (station.amenities.isNotEmpty) ...[
+                Text(
+                  'Amenities',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: station.amenities
+                      .map((amenity) => Chip(
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.grey.shade600
+                                    : colorPrimary,
                                 width: 1,
                               ),
-                              borderRadius: BorderRadius.circular(8)),
-                          label: Text(amenity),
-                          backgroundColor: colorPrimary.withOpacity(0.1),
-                          labelStyle: const TextStyle(color: colorPrimary),
-                        ))
-                    .toList(),
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            /// Action Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: _AnimatedActionButton(
-                    onPressed: () async {
-                      final lat = station.location.latitude;
-                      final lng = station.location.longitude;
-                      final googleMapsUrl =
-                          'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
-                      if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
-                        await launchUrl(Uri.parse(googleMapsUrl),
-                            mode: LaunchMode.externalApplication);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Could not open Google Maps.')),
-                        );
-                      }
-                    },
-                    icon: Icons.directions_car_filled,
-                    label: 'Navigate',
-                    backgroundColor: Colors.blue[600]!,
-                    iconColor: Colors.white,
-                    textColor: Colors.white,
-                    gradient: LinearGradient(
-                      colors: [Colors.blue[600]!, Colors.blue[800]!],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            label: Text(
+                              amenity,
+                              style: TextStyle(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.grey.shade100
+                                    : colorPrimary,
+                              ),
+                            ),
+                            backgroundColor:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.grey.shade800
+                                    : colorPrimary.withOpacity(0.1),
+                          ))
+                      .toList(),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _AnimatedActionButton(
-                    onPressed: () {
-                      Get.to(() => StationDetailsScreen(stationId: station.id));
-                      log("Station Id : ${station.id}");
-                    },
-                    icon: Icons.calendar_today_rounded,
-                    label: 'Book Now',
-                    backgroundColor: colorPrimary,
-                    iconColor: Colors.white,
-                    textColor: Colors.white,
-                    gradient: LinearGradient(
-                      colors: [colorPrimary, colorPrimary.withOpacity(0.8)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                ),
+                const SizedBox(height: 16),
               ],
-            ),
-          ],
+
+              /// Action Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: _AnimatedActionButton(
+                      onPressed: () async {
+                        final lat = station.location.latitude;
+                        final lng = station.location.longitude;
+                        final googleMapsUrl =
+                            'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+                        if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+                          await launchUrl(Uri.parse(googleMapsUrl),
+                              mode: LaunchMode.externalApplication);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Could not open Google Maps.')),
+                          );
+                        }
+                      },
+                      icon: Icons.directions_car_filled,
+                      label: 'Navigate',
+                      backgroundColor: Colors.blue[600]!,
+                      iconColor: Colors.white,
+                      textColor: Colors.white,
+                      gradient: LinearGradient(
+                        colors: [Colors.blue[600]!, Colors.blue[800]!],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _AnimatedActionButton(
+                      onPressed: () {
+                        Get.to(
+                            () => StationDetailsScreen(stationId: station.id));
+                        log("Station Id : ${station.id}");
+                      },
+                      icon: Icons.calendar_today_rounded,
+                      label: 'Book Now',
+                      backgroundColor: colorPrimary,
+                      iconColor: Colors.white,
+                      textColor: Colors.white,
+                      gradient: LinearGradient(
+                        colors: [colorPrimary, colorPrimary.withOpacity(0.8)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildPortCard(ChargingPort port) {
+  Widget _buildPortCard(BuildContext context, ChargingPort port) {
+    final theme = Theme.of(context);
+    final cardColor = theme.cardColor;
+    final textColor = theme.colorScheme.onSurface;
+    final backgroundBarColor = theme.brightness == Brightness.dark
+        ? Colors.white.withOpacity(0.1)
+        : Colors.grey[200];
+
     return Card(
+      color: theme.brightness == Brightness.dark
+          ? Colors.grey.shade900
+          : Colors.white.withOpacity(0.9),
       margin: const EdgeInsets.only(bottom: 8),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Port Type and Status
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   port.type,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
+                    color: textColor,
                   ),
                 ),
                 Container(
@@ -624,21 +700,33 @@ class StationDetailSheet extends StatelessWidget {
                 ),
               ],
             ),
+
             const SizedBox(height: 8),
+
+            // Pricing and Slots
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Price: \$${port.pricing.toStringAsFixed(2)}/kWh'),
-                Text('${port.slotsPerDay} slots/day'),
+                Text(
+                  'Price: \$${port.pricing.toStringAsFixed(2)}/kWh',
+                  style: TextStyle(color: textColor),
+                ),
+                Text(
+                  '${port.slotsPerDay} slots/day',
+                  style: TextStyle(color: textColor),
+                ),
               ],
             ),
+
             const SizedBox(height: 8),
+
+            // Booking Progress Bar
             LinearProgressIndicator(
               value: port.slots.isEmpty
                   ? 0.0
                   : port.slots.where((slot) => slot.isBooked).length /
                       port.slots.length,
-              backgroundColor: Colors.grey[200],
+              backgroundColor: backgroundBarColor,
               valueColor: AlwaysStoppedAnimation<Color>(
                 port.isActive ? Colors.green : Colors.red,
               ),

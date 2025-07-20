@@ -11,11 +11,16 @@ class LogoutScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      // backgroundColor: Colors.black.withOpacity(0.04),
+      backgroundColor: theme.brightness == Brightness.dark
+          ? const Color(0xFF121212)
+          : Colors.white,
       appBar: AppBar(
         title: const Text("Logout"),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: theme.brightness == Brightness.dark
+            ? const Color(0xFF1F1F1F)
+            // ? Colors.black
+            : Colors.white,
         elevation: 0,
       ),
       body: Padding(
@@ -65,6 +70,8 @@ class LogoutScreen extends StatelessWidget {
   }
 
   Future<void> showConfirmationDialog() async {
+    final theme =
+        Get.context != null ? Theme.of(Get.context!) : ThemeData.dark();
     final LogoutController controller = Get.put(LogoutController());
 
     Get.dialog(
@@ -73,7 +80,9 @@ class LogoutScreen extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 32),
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.brightness == Brightness.dark
+                ? const Color(0xFF1E1E1E)
+                : Colors.white,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Material(

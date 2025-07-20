@@ -36,7 +36,9 @@ class StationDetailsScreen extends StatelessWidget {
 
     String formatTime(DateTime time) => DateFormat('h:mm a').format(time);
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: theme.brightness == Brightness.dark
+          ? const Color(0xFF121212)
+          : Colors.white,
       appBar: AppBar(
         title: const Text("Station Details"),
         // backgroundColor: colorScheme.background,
@@ -172,7 +174,9 @@ class StationDetailsScreen extends StatelessWidget {
                         final todaySlots =
                             getSlotsForDay(port.slots, selectedDay);
                         return Card(
-                          color: colorScheme.surface,
+                          color: theme.brightness == Brightness.dark
+                              ? const Color(0xFF1E1E1E)
+                              : Colors.white,
                           elevation: 2,
                           margin: const EdgeInsets.only(bottom: 16),
                           shape: RoundedRectangleBorder(
@@ -187,8 +191,14 @@ class StationDetailsScreen extends StatelessWidget {
                                   horizontal: 16, vertical: 8),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12)),
-                              backgroundColor: colorScheme.surface,
-                              collapsedBackgroundColor: colorScheme.surface,
+                              backgroundColor:
+                                  theme.brightness == Brightness.dark
+                                      ? const Color(0xFF1E1E1E)
+                                      : Colors.white,
+                              collapsedBackgroundColor:
+                                  theme.brightness == Brightness.dark
+                                      ? const Color(0xFF1E1E1E)
+                                      : Colors.white,
                               title: Row(
                                 children: [
                                   Text(port.type,
@@ -225,21 +235,35 @@ class StationDetailsScreen extends StatelessWidget {
                                             horizontal: 4),
                                         child: ChoiceChip(
                                           label: Text(
-                                              DateFormat('EEE\ndd MMM')
-                                                  .format(date),
-                                              textAlign: TextAlign.center),
+                                            DateFormat('EEE\ndd MMM')
+                                                .format(date),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          checkmarkColor: colorPrimary,
                                           selected: isSelected,
                                           selectedColor: colorScheme.primary
                                               .withOpacity(0.2),
+                                          backgroundColor: theme.brightness ==
+                                                  Brightness.dark
+                                              ? const Color(0xFF1E1E1E)
+                                              : Colors.white,
+                                          side: BorderSide(
+                                            color: isSelected
+                                                ? colorScheme.primary
+                                                : (theme.brightness ==
+                                                        Brightness.dark
+                                                    ? Colors.white24
+                                                    : Colors.black12),
+                                            width: 1.5,
+                                          ),
+                                          labelStyle:
+                                              textTheme.bodySmall?.copyWith(
+                                            color: isSelected
+                                                ? colorScheme.primary
+                                                : colorScheme.onSurface,
+                                          ),
                                           onSelected: (_) =>
                                               dateRx.value = date,
-                                          backgroundColor:
-                                              colorScheme.surfaceVariant,
-                                          labelStyle: textTheme.bodySmall
-                                              ?.copyWith(
-                                                  color: isSelected
-                                                      ? colorScheme.primary
-                                                      : colorScheme.onSurface),
                                         ),
                                       );
                                     },
@@ -252,7 +276,10 @@ class StationDetailsScreen extends StatelessWidget {
                                       final isSelected =
                                           selectedSlotId == slot.id;
                                       return Card(
-                                        color: colorScheme.background,
+                                        color:
+                                            theme.brightness == Brightness.dark
+                                                ? const Color(0xFF1E1E1E)
+                                                : Colors.white,
                                         elevation: 1,
                                         margin: const EdgeInsets.symmetric(
                                             vertical: 4),
