@@ -13,6 +13,7 @@ import 'package:nobile/Constants/app_theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  Get.put(ThemeController());
   bool isLoggedIn = await UserPreferences.isLoggedIn();
   runApp(MyApp(
     isLogged: isLoggedIn,
@@ -27,15 +28,15 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key, required this.isLogged, this.userData});
   @override
   Widget build(BuildContext context) {
-    final ThemeController themeController = Get.put(ThemeController());
+    final ThemeController themeController = Get.find<ThemeController>();
     log(userData.toString());
-    return GetMaterialApp(
-      title: 'EVigo',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: themeController.themeMode,
-      home: isLogged ? MainNavBar() : WelcomeBackScreen(),
-    );
+    return Obx(() => GetMaterialApp(
+          title: 'EVigo',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeController.themeMode,
+          home: isLogged ? MainNavBar() : WelcomeBackScreen(),
+        ));
   }
 }

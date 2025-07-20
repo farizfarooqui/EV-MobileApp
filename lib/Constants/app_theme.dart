@@ -8,7 +8,6 @@ class AppTheme {
   static const Color darkText = Colors.white;
   static const Color darkHint = Colors.white54;
   static const Color darkDivider = Colors.white24;
-
   static const Color lightBg = Colors.white;
   static const Color lightCard = Color(0xFFF5F7FA);
   static const Color lightAccent = Colors.green;

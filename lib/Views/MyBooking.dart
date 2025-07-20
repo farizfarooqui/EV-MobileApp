@@ -108,10 +108,10 @@ class MyBookingScreen extends StatelessWidget {
                     children: [
                       Icon(
                         booking.status.toLowerCase() == 'active'
-                            ? Icons.check_circle
+                            ? Icons.hourglass_bottom
                             : booking.status.toLowerCase() == 'canceled'
                                 ? Icons.cancel
-                                : Icons.hourglass_bottom,
+                                : Icons.check_circle,
                         color: booking.status.toLowerCase() == 'active'
                             ? Colors.green
                             : booking.status.toLowerCase() == 'canceled'
@@ -250,7 +250,7 @@ class MyBookingScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.6),
+                            color: Colors.red.withOpacity(0.25),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Row(
@@ -264,7 +264,7 @@ class MyBookingScreen extends StatelessWidget {
                               Text(
                                 'Cancel',
                                 style: TextStyle(
-                                    color: Colors.white,
+                                    color: Colors.red,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -289,6 +289,9 @@ class MyBookingScreen extends StatelessWidget {
     }
     return SmartRefresher(
       controller: controller,
+      physics: const ScrollPhysics(),
+      enablePullDown: true,
+      enablePullUp: false,
       header: const WaterDropHeader(
         waterDropColor: colorPrimary,
       ),
@@ -299,6 +302,7 @@ class MyBookingScreen extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(bottom: 24),
         child: ListView.builder(
+          physics: const ScrollPhysics(), // Consistent physics
           itemCount: bookings.length,
           itemBuilder: (context, index) {
             return _buildBookingCard(bookings[index], isActive, controller);

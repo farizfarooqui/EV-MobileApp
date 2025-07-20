@@ -169,27 +169,27 @@ class StationFilterSheet extends StatelessWidget {
                       _buildSectionTitle('Quick Filters'),
                       _buildQuickFilters(),
                       const SizedBox(height: 16),
-
-                      // Apply Button
                       SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Get.back();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: colorPrimary,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                          ),
-                          child: const Text(
-                            'Apply Filters',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Get.back();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: colorPrimary,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
+                            child: const Text(
+                              'Apply Filters',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                          )),
                       const SizedBox(height: 16),
                     ],
                   ),
@@ -237,11 +237,15 @@ class StationFilterSheet extends StatelessWidget {
             }
             onSelectionChanged(newSelection);
           },
-          backgroundColor: Colors.grey[200],
+          backgroundColor: Colors.white,
           selectedColor: colorPrimary.withOpacity(0.2),
           checkmarkColor: colorPrimary,
           labelStyle: TextStyle(
             color: isSelected ? colorPrimary : Colors.black87,
+          ),
+          side: BorderSide(
+            color: isSelected ? colorPrimary : Colors.black.withOpacity(0.1),
+            width: 1.5,
           ),
         );
       }).toList(),
@@ -256,12 +260,20 @@ class StationFilterSheet extends StatelessWidget {
               value: controller.openOnly.value,
               onChanged: (value) => controller.updateOpenOnly(value),
               activeColor: colorPrimary,
+              activeTrackColor: colorPrimary.withOpacity(0.4),
+              inactiveThumbColor: Colors.grey.shade400,
+              inactiveTrackColor: Colors.grey.shade300,
+              trackOutlineColor: const WidgetStatePropertyAll(Colors.white),
             )),
         Obx(() => SwitchListTile(
               title: const Text('Available Ports Only'),
               value: controller.availableOnly.value,
               onChanged: (value) => controller.updateAvailableOnly(value),
               activeColor: colorPrimary,
+              activeTrackColor: colorPrimary.withOpacity(0.4),
+              inactiveThumbColor: Colors.grey.shade400,
+              inactiveTrackColor: Colors.grey.shade300,
+              trackOutlineColor: const WidgetStatePropertyAll(Colors.white),
             )),
       ],
     );

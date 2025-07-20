@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:nobile/Constants/Constants.dart';
 import 'package:nobile/Controller/StationDetailController.dart';
 import 'package:nobile/Model/StationModel.dart';
 import 'package:nobile/Views/Widgets/SmallLoader.dart';
@@ -141,11 +142,17 @@ class StationDetailsScreen extends StatelessWidget {
                         spacing: 8,
                         children: station.amenities
                             .map((a) => Chip(
-                                  label: Text(a,
-                                      style: textTheme.bodySmall?.copyWith(
-                                          color: colorScheme.primary)),
+                                  label: Text(
+                                    a,
+                                    style: textTheme.bodySmall
+                                        ?.copyWith(color: colorScheme.primary),
+                                  ),
                                   backgroundColor:
                                       colorScheme.primary.withOpacity(0.08),
+                                  shape: RoundedRectangleBorder(
+                                    side: const BorderSide(color: colorPrimary),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ))
                             .toList(),
                       ),
@@ -357,7 +364,11 @@ class StationDetailsScreen extends StatelessWidget {
                                                                     result:
                                                                         true),
                                                             child: const Text(
-                                                                'Confirm'),
+                                                              'Confirm',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white),
+                                                            ),
                                                           ),
                                                         ],
                                                       ),

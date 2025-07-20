@@ -9,7 +9,6 @@ import 'package:nobile/Controller/StationController.dart';
 import 'package:nobile/Model/StationModel.dart';
 import 'package:nobile/Views/StationDetailsScreen.dart';
 import 'package:nobile/Views/StationFilterSheet.dart';
-import 'package:nobile/Views/Widgets/CustomMarker.dart';
 import 'package:nobile/Views/Widgets/SmallLoader.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,57 +19,64 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Obx(() => FloatingActionButton(
-                  heroTag: null,
-                  onPressed: controller.isLocating.value
-                      ? null
-                      : () {
-                          controller.getCurrentLocation();
-                        },
-                  backgroundColor: Colors.white,
-                  child: controller.isLocating.value
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: SmallLoader(
-                            color: colorPrimary,
-                          ),
-                        )
-                      : const Icon(
-                          Icons.my_location,
-                          color: colorPrimary,
-                        ),
-                )),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 90),
-            child: FloatingActionButton(
-              heroTag: null,
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(24)),
-                  ),
-                  builder: (context) => StationFilterSheet(),
-                );
-              },
-              backgroundColor: Colors.white,
-              child: const Icon(
-                Icons.filter_list,
-                color: colorPrimary,
+      resizeToAvoidBottomInset: true,
+      floatingActionButton: IgnorePointer(
+        ignoring: controller.isClosed,
+        child: Opacity(
+          opacity: controller.isClosed ? 0 : 1,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Obx(() => FloatingActionButton(
+                      heroTag: null,
+                      onPressed: controller.isLocating.value
+                          ? null
+                          : () {
+                              controller.getCurrentLocation();
+                            },
+                      backgroundColor: Colors.white,
+                      child: controller.isLocating.value
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: SmallLoader(
+                                color: colorPrimary,
+                              ),
+                            )
+                          : const Icon(
+                              Icons.my_location,
+                              color: colorPrimary,
+                            ),
+                    )),
               ),
-            ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 90),
+                child: FloatingActionButton(
+                  heroTag: null,
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(24)),
+                      ),
+                      builder: (context) => StationFilterSheet(),
+                    );
+                  },
+                  backgroundColor: Colors.white,
+                  child: const Icon(
+                    Icons.filter_list,
+                    color: colorPrimary,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: Stack(
